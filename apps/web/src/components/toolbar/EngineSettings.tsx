@@ -1,38 +1,60 @@
-import { Divider, Flex, Kbd, Select, Switch, Text } from "@mantine/core"
-import { useHotkeys, useLocalStorage } from "@mantine/hooks"
-import { ColorBlend } from "@repo/grx-engine/types"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-import { actions } from "@src/contexts/Spotlight"
+import { useEffect, useContext, JSX } from "react"
+import { Text, Flex, Select, Switch, Divider, Kbd } from "@mantine/core"
 import {
-  IconHexagonPlus,
   IconZoom,
   IconZoomScan,
-  // IconHexagonOff,
+  IconHexagonPlus,
 } from "@tabler/icons-react"
-import { useContext, useEffect } from "react"
+import { ColorBlend } from "@repo/engine/types"
+import { useHotkeys, useLocalStorage } from "@mantine/hooks"
+import { actions } from "@src/contexts/Spotlight"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
 
-type EngineSettingsProps = {}
+interface EngineSettingsProps {}
 
 export default function EngineSettings(_props: EngineSettingsProps): JSX.Element | null {
-  const { renderEngine } = useContext(EditorConfigProvider)
+  const { renderer } = useContext(EditorConfigProvider)
   const [colorBlend, setColorBlend] = useLocalStorage<ColorBlend>({
     key: "engine:COLOR_BLEND",
-    defaultValue: renderEngine.settings.COLOR_BLEND,
+    defaultValue: "Contrast",
   })
   const [zoomToCursor, setZoomToCursor] = useLocalStorage<boolean>({
     key: "engine:ZOOM_TO_CURSOR",
-    defaultValue: renderEngine.settings.ZOOM_TO_CURSOR,
+    defaultValue: true,
   })
   const [showDatums, setShowDatums] = useLocalStorage<boolean>({
     key: "engine:SHOW_DATUMS",
-    defaultValue: renderEngine.settings.SHOW_DATUMS,
+    defaultValue: true,
+  })
+  // const [enable3D, setEnable3D] = useLocalStorage<boolean>({
+  //   key: "engine:ENABLE_3D",
+  //   defaultValue: false,
+  // })
+  const [perspective3D, setPerspective3D] = useLocalStorage<boolean>({
+    key: "engine:PERSPECTIVE_3D",
+    defaultValue: false,
   })
 
+  async function getEngineSettings(): Promise<void> {
+    const settings = await renderer.engine.interface.read_engine_settings()
+    setColorBlend(settings.COLOR_BLEND)
+    setZoomToCursor(settings.ZOOM_TO_CURSOR)
+    setShowDatums(settings.SHOW_DATUMS)
+  }
+
   useEffect(() => {
-    renderEngine.settings.COLOR_BLEND = colorBlend
-    renderEngine.settings.ZOOM_TO_CURSOR = zoomToCursor
-    renderEngine.settings.SHOW_DATUMS = showDatums
-  }, [colorBlend, zoomToCursor, showDatums])
+    getEngineSettings()
+  }, [])
+
+  useEffect(() => {
+    renderer.engine.interface.set_engine_settings({
+      COLOR_BLEND: colorBlend,
+      ZOOM_TO_CURSOR: zoomToCursor,
+      SHOW_DATUMS: showDatums,
+      // ENABLE_3D: enable3D,
+      PERSPECTIVE_3D: perspective3D,
+    })
+  }, [colorBlend, zoomToCursor, showDatums, perspective3D])
 
   useEffect(() => {
     actions.push({
@@ -83,6 +105,11 @@ export default function EngineSettings(_props: EngineSettingsProps): JSX.Element
       <Flex align="center" style={{ width: "100%" }} justify="space-between">
         <Text>Show Datums</Text>
         <Switch checked={showDatums} onChange={(event): void => setShowDatums(event.currentTarget.checked)} />
+      </Flex>
+      <Divider my="sm" />
+      <Flex align="center" style={{ width: "100%" }} justify="space-between">
+        <Text>3D Perspective View</Text>
+        <Switch checked={perspective3D} onChange={(event): void => setPerspective3D(event.currentTarget.checked)} />
       </Flex>
     </>
   )

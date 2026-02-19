@@ -1,5 +1,5 @@
 {
-  "name": "@repo/gdsii",
+  "name": "@repo/parser-gdsii",
   "version": "0.0.0",
   "type": "module",
   "scripts": {

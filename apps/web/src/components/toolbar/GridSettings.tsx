@@ -1,54 +1,85 @@
-import { Button, ColorPicker, Divider, Flex, Group, NumberInput, SegmentedControl, Space, Switch, Text } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
-import { gridSettings } from "@repo/grx-engine/settings"
-import { getUnitsConversion } from "@repo/grx-engine/utils"
-import chroma from "chroma-js"
-import type { vec4 } from "gl-matrix"
-import React, { useEffect } from "react"
+import React, { JSX, useEffect } from "react"
 import { EditorConfigProvider } from "../../contexts/EditorContext"
+import chroma from "chroma-js"
+import { Text, Switch, Divider, Group, Flex, ColorPicker, SegmentedControl, NumberInput, Button, Space } from "@mantine/core"
+import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import { vec4 } from "gl-matrix"
+import { useLocalStorage } from "@mantine/hooks"
+import { gridSettings } from "@repo/engine/settings"
 
-type GridSettingsProps = {}
+interface GridSettingsProps {}
 const defaultGridSettings = JSON.parse(JSON.stringify(gridSettings))
 
 export default function GridSettings(_props: GridSettingsProps): JSX.Element | null {
-  const { units, renderEngine } = React.useContext(EditorConfigProvider)
+  const { units, renderer } = React.useContext(EditorConfigProvider)
   const [spacingX, setSpacingX] = useLocalStorage<number>({
     key: "engine:grid:spacing_x",
-    defaultValue: renderEngine.grid.spacing_x,
+    // defaultValue: renderer.grid.spacing_x,
+    defaultValue: 0
   })
   const [spacingY, setSpacingY] = useLocalStorage<number>({
     key: "engine:grid:spacing_y",
-    defaultValue: renderEngine.grid.spacing_y,
+    // defaultValue: renderer.grid.spacing_y,
+    defaultValue: 0
   })
   const [offsetX, setOffsetX] = useLocalStorage<number>({
     key: "engine:grid:offset_x",
-    defaultValue: renderEngine.grid.offset_x,
+    // defaultValue: renderer.grid.offset_x,
+    defaultValue: 0
   })
   const [offsetY, setOffsetY] = useLocalStorage<number>({
     key: "engine:grid:offset_y",
-    defaultValue: renderEngine.grid.offset_y,
+    // defaultValue: renderer.grid.offset_y,
+    defaultValue: 0
   })
   const [enabled, setEnabled] = useLocalStorage<boolean>({
     key: "engine:grid:enabled",
-    defaultValue: renderEngine.grid.enabled,
+    // defaultValue: renderer.grid.enabled,
+    defaultValue: false
   })
   const [type, setType] = useLocalStorage<"lines" | "dots">({
     key: "engine:grid:type",
-    defaultValue: renderEngine.grid.type,
+    // defaultValue: renderer.grid.type,
+    defaultValue: "lines"
   })
   const [color, setColor] = useLocalStorage<vec4>({
     key: "engine:grid:color",
-    defaultValue: renderEngine.grid.color,
+    // defaultValue: renderer.grid.color,
+    defaultValue: vec4.fromValues(0.5, 0.5, 0.5, 1)
   })
 
+  async function getGridSettings(): Promise<void> {
+    const grid = await renderer.engine.interface.read_grid_settings()
+    setSpacingX(grid.spacing_x)
+    setSpacingY(grid.spacing_y)
+    setOffsetX(grid.offset_x)
+    setOffsetY(grid.offset_y)
+    setEnabled(grid.enabled)
+    setType(grid.type)
+    setColor(grid.color)
+  }
+
   useEffect(() => {
-    renderEngine.grid.spacing_x = spacingX
-    renderEngine.grid.spacing_y = spacingY
-    renderEngine.grid.offset_x = offsetX
-    renderEngine.grid.offset_y = offsetY
-    renderEngine.grid.enabled = enabled
-    renderEngine.grid.type = type
-    renderEngine.grid.color = color
+    getGridSettings()
+  }, [])
+
+  useEffect(() => {
+    // renderer.grid.spacing_x = spacingX
+    // renderer.grid.spacing_y = spacingY
+    // renderer.grid.offset_x = offsetX
+    // renderer.grid.offset_y = offsetY
+    // renderer.grid.enabled = enabled
+    // renderer.grid.type = type
+    // renderer.grid.color = color
+    renderer.engine.interface.update_grid_settings({
+      spacing_x: spacingX,
+      spacing_y: spacingY,
+      offset_x: offsetX,
+      offset_y: offsetY,
+      enabled: enabled,
+      type: type,
+      color: color,
+    })
   }, [spacingX, spacingY, offsetX, offsetY, enabled, type, color])
 
   return (
@@ -87,15 +118,15 @@ export default function GridSettings(_props: GridSettingsProps): JSX.Element | n
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((spacingX * getUnitsConversion(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setSpacingX(Number(value) / getUnitsConversion(units))}
+            value={Math.round((spacingX * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setSpacingX(Number(value) / baseUnitsConversionFactor(units))}
           />
           Y:
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((spacingY * getUnitsConversion(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setSpacingY(Number(value) / getUnitsConversion(units))}
+            value={Math.round((spacingY * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setSpacingY(Number(value) / baseUnitsConversionFactor(units))}
           />
         </Group>
       </Flex>
@@ -112,15 +143,15 @@ export default function GridSettings(_props: GridSettingsProps): JSX.Element | n
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((offsetX * getUnitsConversion(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setOffsetX(Number(value) / getUnitsConversion(units))}
+            value={Math.round((offsetX * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setOffsetX(Number(value) / baseUnitsConversionFactor(units))}
           />
           Y:
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((offsetY * getUnitsConversion(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setOffsetY(Number(value) / getUnitsConversion(units))}
+            value={Math.round((offsetY * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setOffsetY(Number(value) / baseUnitsConversionFactor(units))}
           />
         </Group>
       </Flex>

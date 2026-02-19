@@ -1,51 +1,65 @@
-// import chroma from 'chroma-js'
-import { ActionIcon, Card, Group, Kbd, Modal, Popover, Tooltip, useMantineTheme } from "@mantine/core"
-import { useDisclosure, useHotkeys } from "@mantine/hooks"
-import { PointerMode } from "@repo/grx-engine/types"
-import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
-import { actions } from "@src/contexts/Spotlight"
-import type { PointerSettings } from "@src/renderer"
+import React, { JSX } from "react"
 import {
+  IconArrowsMove,
+  IconRulerMeasure,
   // IconZoomIn,
   // IconZoomOut,
   // IconHome,
   IconAdjustments,
-  IconArrowsMove,
-  IconBone,
-  IconBoneOff,
-  IconClick,
+  IconCube3dSphere,
   // IconCube3dSphereOff,
   IconCube,
-  IconCube3dSphere,
-  IconEngine,
   // IconGridDots,
   IconGrid4x4,
-  IconPointerPin,
-  IconRulerMeasure,
-  IconTrashX,
+  IconClick,
   IconZoomReset,
+  IconTrashX,
+  IconEngine,
+  IconPointerPin,
+  IconBone,
+  IconBoneOff,
+  IconBadge3d,
 } from "@tabler/icons-react"
-import { useContextMenu } from "mantine-contextmenu"
-import React from "react"
-import EngineSettings from "./EngineSettings"
+// import chroma from 'chroma-js'
+import { Modal, ActionIcon, Card, Group, Tooltip, useMantineTheme, Kbd, Popover } from "@mantine/core"
+import { useDisclosure, useHotkeys } from "@mantine/hooks"
 import GeneralSettings from "./GeneralSettings"
 import GridSettings from "./GridSettings"
+import EngineSettings from "./EngineSettings"
+import type { PointerSettings } from "@repo/engine/index"
+import { useContextMenu } from "mantine-contextmenu"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { actions } from "@src/contexts/Spotlight"
+import { menuItems } from "@src/contexts/EditorContext"
+import { PointerMode } from "@repo/engine/types"
 import SnapSettings from "./SnapSettings"
+import ThreeDSettings from './3DSettings'
 
-type ToolbarProps = {}
+interface ToolbarProps {}
 
 export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
-  const { units, renderEngine } = React.useContext(EditorConfigProvider)
+  const { units, renderer } = React.useContext(EditorConfigProvider)
   const [settingsModalOpen, { open, close }] = useDisclosure(false)
   const [gridSettingsModal, gridSettingsModalHandlers] = useDisclosure(false)
   const [engineSettingsModal, engineSettingsModalHandlers] = useDisclosure(false)
   const [snapSettingsModal, snapSettingsModalHandlers] = useDisclosure(false)
-  const [outlineMode, setOutlineMode] = React.useState<boolean>(renderEngine.settings.OUTLINE_MODE)
-  const [skeletonMode, setSkeletonMode] = React.useState<boolean>(renderEngine.settings.SKELETON_MODE)
-  // const [gridMode, setGridMode] = React.useState<'dots' | 'lines'>(renderEngine.grid.type)
-  const [pointerMode, setPointerMode] = React.useState<PointerSettings["mode"]>(renderEngine.pointerSettings.mode)
+  const [threeDSettingsModal, threeDSettingsModalHandlers] = useDisclosure(false)
+  const [outlineMode, setOutlineMode] = React.useState<boolean>(false)
+  const [skeletonMode, setSkeletonMode] = React.useState<boolean>(false)
+  // const [gridMode, setGridMode] = React.useState<'dots' | 'lines'>(renderer.grid.type)
+  const [pointerMode, setPointerMode] = React.useState<PointerSettings["mode"]>(renderer.pointerSettings.mode)
   const { showContextMenu } = useContextMenu()
   const theme = useMantineTheme()
+
+  async function getModes(): Promise<void> {
+    const settings = await renderer.engine.interface.read_engine_settings()
+    setOutlineMode(settings.OUTLINE_MODE)
+    setSkeletonMode(settings.SKELETON_MODE)
+  }
+
+  React.useEffect(() => {
+    getModes()
+  }, [])
 
   React.useEffect(() => {
     menuItems.push({
@@ -53,8 +67,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       title: "Clear Measurements",
       icon: <IconTrashX stroke={1.5} size={18} color={theme.colors.red[7]} />,
       onClick: async (): Promise<void> => {
-        const backend = await renderEngine.backend
-        backend.clearMeasurements("main")
+        renderer.engine.interface.clear_view_measurements("main")
       },
     })
     actions.push({
@@ -62,7 +75,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Disable Outline Mode",
       description: "Default fill mode",
       onClick: () => {
-        renderEngine.settings.OUTLINE_MODE = false
+        renderer.engine.interface.set_engine_settings({ OUTLINE_MODE: false })
         setOutlineMode(false)
       },
       leftSection: <IconCube />,
@@ -73,7 +86,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Enable Outline Mode",
       description: "Show outline of all features",
       onClick: () => {
-        renderEngine.settings.OUTLINE_MODE = true
+        renderer.engine.interface.set_engine_settings({ OUTLINE_MODE: true })
         setOutlineMode(true)
       },
       leftSection: <IconCube3dSphere />,
@@ -84,7 +97,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Disable Skeleton Mode",
       description: "Default fill mode",
       onClick: () => {
-        renderEngine.settings.SKELETON_MODE = false
+        renderer.engine.interface.set_engine_settings({ SKELETON_MODE: false })
         setSkeletonMode(false)
       },
       leftSection: <IconBoneOff />,
@@ -95,7 +108,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Enable Skeleton Mode",
       description: "Show skeleton of all lines and arcs, outline of the rest of feature types",
       onClick: () => {
-        renderEngine.settings.SKELETON_MODE = true
+        renderer.engine.interface.set_engine_settings({ SKELETON_MODE: true })
         setSkeletonMode(true)
       },
       leftSection: <IconBone />,
@@ -130,8 +143,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Clear Measurements",
       description: "Delete and remove all measurements",
       onClick: async (): Promise<void> => {
-        const backend = await renderEngine.backend
-        backend.clearMeasurements("main")
+        renderer.engine.interface.clear_view_measurements("main")
       },
       leftSection: <IconTrashX />,
       // rightSection: <Kbd>A</Kbd>
@@ -141,7 +153,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Mouse Move Mode",
       description: "Enable mouse move mode",
       onClick: () => {
-        renderEngine.pointerSettings.mode = PointerMode.MOVE
+        renderer.pointerSettings.mode = PointerMode.MOVE
         setPointerMode(PointerMode.MOVE)
       },
       leftSection: <IconArrowsMove />,
@@ -152,7 +164,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Mouse Select Mode",
       description: "Enable mouse select mode",
       onClick: () => {
-        renderEngine.pointerSettings.mode = PointerMode.SELECT
+        renderer.pointerSettings.mode = PointerMode.SELECT
         setPointerMode(PointerMode.SELECT)
       },
       leftSection: <IconClick />,
@@ -163,7 +175,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       label: "Mouse Measure Mode",
       description: "Enable mouse measure mode",
       onClick: () => {
-        renderEngine.pointerSettings.mode = PointerMode.MEASURE
+        renderer.pointerSettings.mode = PointerMode.MEASURE
         setPointerMode(PointerMode.MEASURE)
       },
       leftSection: <IconRulerMeasure />,
@@ -175,36 +187,38 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
     [
       "a",
       (): void => {
-        renderEngine.pointerSettings.mode = PointerMode.MOVE
+        renderer.pointerSettings.mode = PointerMode.MOVE
         setPointerMode(PointerMode.MOVE)
       },
     ],
     [
       "s",
       (): void => {
-        renderEngine.pointerSettings.mode = PointerMode.SELECT
+        renderer.pointerSettings.mode = PointerMode.SELECT
         setPointerMode(PointerMode.SELECT)
       },
     ],
     [
       "d",
       (): void => {
-        renderEngine.pointerSettings.mode = PointerMode.MEASURE
+        renderer.pointerSettings.mode = PointerMode.MEASURE
         setPointerMode(PointerMode.MEASURE)
       },
     ],
     [
       "o",
-      (): void => {
-        renderEngine.settings.OUTLINE_MODE = !renderEngine.settings.OUTLINE_MODE
-        setOutlineMode(renderEngine.settings.OUTLINE_MODE)
+      async (): Promise<void> => {
+        const currentSettings = await renderer.engine.interface.read_engine_settings()
+        renderer.engine.interface.set_engine_settings({ OUTLINE_MODE: !currentSettings.OUTLINE_MODE })
+        setOutlineMode(!currentSettings.OUTLINE_MODE)
       },
     ],
     [
       "p",
-      (): void => {
-        renderEngine.settings.SKELETON_MODE = !renderEngine.settings.SKELETON_MODE
-        setSkeletonMode(renderEngine.settings.SKELETON_MODE)
+      async (): Promise<void> => {
+        const currentSettings = await renderer.engine.interface.read_engine_settings()
+        renderer.engine.interface.set_engine_settings({ SKELETON_MODE: !currentSettings.SKELETON_MODE })
+        setSkeletonMode(!currentSettings.SKELETON_MODE)
       },
     ],
     // ['g', gridSettingsModalHandlers.open],
@@ -212,9 +226,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
     [
       "f",
       (): void => {
-        renderEngine.backend.then(async (backend) => {
-          backend.zoomFit("main")
-        })
+        renderer.engine.interface.update_view_zoom_fit_artwork("main")
       },
     ],
   ])
@@ -225,14 +237,14 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       key: "1",
       icon: <IconTrashX stroke={1.5} size={18} style={{ color: theme.colors.red[7] }} />,
       onClick: async (): Promise<void> => {
-        const backend = await renderEngine.backend
-        backend.clearMeasurements("main")
+        const engine = await renderer.engine
+        engine.interface.clear_view_measurements("main")
       },
     },
   ]
 
   React.useEffect(() => {
-    renderEngine.backend.then((backend) => backend.setMeasurementSettings({ units }))
+    renderer.engine.interface.update_measurement_settings({ units })
   }, [])
 
   return (
@@ -258,7 +270,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
                 radius="sm"
                 variant={pointerMode == PointerMode.MOVE ? "outline" : "default"}
                 onClick={() => {
-                  renderEngine.pointerSettings.mode = PointerMode.MOVE
+                  renderer.pointerSettings.mode = PointerMode.MOVE
                   setPointerMode(PointerMode.MOVE)
                 }}
               >
@@ -271,7 +283,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
                 radius="sm"
                 variant={pointerMode == PointerMode.SELECT ? "outline" : "default"}
                 onClick={() => {
-                  renderEngine.pointerSettings.mode = PointerMode.SELECT
+                  renderer.pointerSettings.mode = PointerMode.SELECT
                   setPointerMode(PointerMode.SELECT)
                 }}
               >
@@ -284,7 +296,7 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
                 radius="sm"
                 variant={pointerMode == PointerMode.MEASURE ? "outline" : "default"}
                 onClick={(): void => {
-                  renderEngine.pointerSettings.mode = PointerMode.MEASURE
+                  renderer.pointerSettings.mode = PointerMode.MEASURE
                   setPointerMode(PointerMode.MEASURE)
                 }}
                 onContextMenu={showContextMenu(contextItems)}
@@ -294,19 +306,21 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
             </Tooltip>
           </ActionIcon.Group>
           <ActionIcon.Group>
+            {/* ZOOM HOME */}
             <Tooltip openDelay={1000} withArrow label="Zoom Fit">
               <ActionIcon
                 size="lg"
                 radius="sm"
                 variant="default"
                 onClick={async (): Promise<void> => {
-                  const backend = await renderEngine.backend
-                  backend.zoomFit("main")
+                  const engine = await renderer.engine
+                  engine.interface.update_view_zoom_fit_artwork("main")
                 }}
               >
                 <IconZoomReset size={18} />
               </ActionIcon>
             </Tooltip>
+            {/* SNAP */}
             <Popover withArrow position="bottom" radius="md">
               <Popover.Target>
                 <Tooltip openDelay={1000} withArrow label="Snap Settings">
@@ -323,43 +337,65 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
                 <SnapSettings />
               </Popover.Dropdown>
             </Popover>
+            {/* 3D */}
+            <Popover withArrow position="bottom" radius="md">
+              <Popover.Target>
+                <Tooltip openDelay={1000} withArrow label="3D Settings">
+                  <ActionIcon size="lg" radius="sm" variant="default">
+                    <IconBadge3d size={18} />
+                  </ActionIcon>
+                </Tooltip>
+              </Popover.Target>
+              <Popover.Dropdown
+                style={{
+                  padding: "4px",
+                }}
+              >
+                <ThreeDSettings />
+              </Popover.Dropdown>
+            </Popover>
+            {/* OUTLINE MODE */}
             <Tooltip openDelay={1000} withArrow label="Outline Mode">
               <ActionIcon
                 size="lg"
                 radius="sm"
                 variant="default"
                 onClick={async (): Promise<void> => {
-                  renderEngine.settings.OUTLINE_MODE = !outlineMode
+                  renderer.engine.interface.set_engine_settings({ OUTLINE_MODE: !outlineMode })
                   setOutlineMode(!outlineMode)
                 }}
               >
                 {outlineMode ? <IconCube3dSphere size={18} /> : <IconCube size={18} />}
               </ActionIcon>
             </Tooltip>
+            {/* SKELETON MODE */}
             <Tooltip openDelay={1000} withArrow label="Skeleton Mode">
               <ActionIcon
                 size="lg"
                 radius="sm"
                 variant="default"
                 onClick={async (): Promise<void> => {
-                  renderEngine.settings.SKELETON_MODE = !skeletonMode
+                  renderer.engine.interface.set_engine_settings({ SKELETON_MODE: !skeletonMode })
                   setSkeletonMode(!skeletonMode)
                 }}
               >
                 {skeletonMode ? <IconBone size={18} /> : <IconBoneOff size={18} />}
               </ActionIcon>
             </Tooltip>
+            {/* GRID SETTINGS */}
             <Tooltip openDelay={1000} withArrow label="Grid Settings">
               <ActionIcon size="lg" radius="sm" variant="default" onClick={gridSettingsModalHandlers.open}>
                 <IconGrid4x4 size={18} />
               </ActionIcon>
             </Tooltip>
+            {/* ENGINE SETTINGS */}
             <Tooltip openDelay={1000} withArrow label="Engine Settings">
               <ActionIcon size="lg" radius="sm" variant="default" onClick={engineSettingsModalHandlers.open}>
                 <IconEngine size={18} />
               </ActionIcon>
             </Tooltip>
           </ActionIcon.Group>
+          {/* SETTINGS */}
           <Tooltip openDelay={1000} withArrow label="Settings">
             <ActionIcon size="lg" radius="sm" variant="default" onClick={open}>
               <IconAdjustments size={18} />
@@ -378,6 +414,9 @@ export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
       </Modal>
       <Modal title="Snap Settings" keepMounted opened={snapSettingsModal} onClose={snapSettingsModalHandlers.close}>
         <SnapSettings />
+      </Modal>
+      <Modal title="3D Settings" keepMounted opened={threeDSettingsModal} onClose={threeDSettingsModalHandlers.close}>
+        <ThreeDSettings />
       </Modal>
     </>
   )

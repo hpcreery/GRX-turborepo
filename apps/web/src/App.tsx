@@ -1,65 +1,67 @@
 import "./App.css"
-import { Box, Center, Loader, Skeleton, useMantineColorScheme, useMantineTheme } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
-import { notifications } from "@mantine/notifications"
-import { EngineEvents, type MessageData } from "@repo/grx-engine/engine"
-import type { Units } from "@repo/grx-engine/types"
-import { RenderEngine } from "@repo/grx-renderer"
-import { IconPhotoDown } from "@tabler/icons-react"
-// import { RenderEngine } from "./renderer-old"
+import { useRef, useEffect, useState, useContext, JSX } from "react"
+import { Renderer } from "@repo/engine/index"
 import chroma from "chroma-js"
-import * as Comlink from "comlink"
-import { useContextMenu } from "mantine-contextmenu"
-import { useContext, useEffect, useRef, useState } from "react"
-import { FeatureSidebar } from "./components/feature-sidebar/FeatureSidebar"
 import InfoModal from "./components/InfoModal"
-import LayerSidebar from "./components/layer-sidebar/LayersSidebar"
-import MousePosition from "./components/MousePosition"
 import Toolbar from "./components/toolbar/Toolbar"
-import { EditorConfigProvider, menuItems } from "./contexts/EditorContext"
+import MousePosition from "./components/MousePosition"
+import LayerSidebar from "./components/layer-sidebar/LayersSidebar"
+import { Box, Center, Loader, Skeleton, useMantineColorScheme, useMantineTheme } from "@mantine/core"
+import { EditorConfigProvider } from "./contexts/EditorContext"
 import { ThemeConfigProvider } from "./contexts/ThemeContext"
+import { FeatureSidebar } from "./components/feature-sidebar/FeatureSidebar"
+import { useContextMenu } from "mantine-contextmenu"
+import { menuItems } from "./contexts/EditorContext"
+import { useLocalStorage } from "@mantine/hooks"
+import { Units } from "@repo/engine/types"
+import { IconPhotoDown } from "@tabler/icons-react"
+
+const PROJECT_NAME = "main"
+const STEP_NAME = "main"
 
 export default function App(): JSX.Element | null {
   const { transparency } = useContext(ThemeConfigProvider)
   const theme = useMantineTheme()
   const colors = useMantineColorScheme()
   const elementRef = useRef<HTMLDivElement>(document.createElement("div"))
-  const [renderEngine, setRenderEngine] = useState<RenderEngine>()
+  const viewRef = useRef<HTMLDivElement>(document.createElement("div"))
+  const [renderer, setRenderEngine] = useState<Renderer>()
   const [ready, setReady] = useState<boolean>(false)
   const { showContextMenu } = useContextMenu()
 
   // Load in the render engine
   useEffect(() => {
     console.log("Loading Engine Application")
-    const Engine = new RenderEngine({ container: elementRef.current })
-    setRenderEngine(Engine)
+    const renderer = new Renderer({ container: elementRef.current, attributes: { powerPreference: "high-performance", antialias: false } })
+    renderer.interface.create_project(PROJECT_NAME)
+    renderer.interface.create_step(PROJECT_NAME, STEP_NAME)
+    renderer.addManagedView(viewRef.current, {
+      project: PROJECT_NAME,
+      step: STEP_NAME,
+    })
+    setRenderEngine(renderer)
     setEngineBackgroundColor()
-    Engine.onLoad(() => {
-      console.log("Engine Application Loaded", Engine)
+    renderer.onLoad(() => {
+      console.log("Engine Application Loaded", renderer)
       setReady(true)
-      Engine.backend.then((backend) => {
-        backend.addEventCallback(
-          EngineEvents.MESSAGE,
-          Comlink.proxy((e) => msg(e as MessageData)),
-        )
-      })
       menuItems.push({
         key: "download-canvas",
         icon: <IconPhotoDown stroke={1.5} size={18} />,
         title: "Download Screensot",
-        onClick: () => Engine.downloadImage(),
+        onClick: () => renderer.downloadImage(),
       })
     })
     return (): void => {
-      Engine.destroy()
+      renderer.destroy()
     }
   }, [])
 
   function setEngineBackgroundColor(): void {
-    if (renderEngine != undefined) {
-      renderEngine.settings.BACKGROUND_COLOR = chroma(colors.colorScheme == "dark" ? theme.colors.dark[8] : theme.colors.gray[1])
+    if (renderer != undefined) {
+      const color = chroma(colors.colorScheme == "dark" ? theme.colors.dark[8] : theme.colors.gray[1])
         .alpha(0)
         .gl()
+      renderer.engine.interface.set_engine_settings({ BACKGROUND_COLOR: color })
     }
   }
 
@@ -69,14 +71,6 @@ export default function App(): JSX.Element | null {
     // removed this use effect deps to ensure background color was set in setup
   })
 
-  function msg(e: MessageData): void {
-    notifications.show({
-      color: e.level,
-      title: e.title,
-      message: e.message,
-    })
-  }
-
   const [units, setUnits] = useLocalStorage<Units>({
     key: "units",
     defaultValue: "mm",
@@ -84,10 +78,11 @@ export default function App(): JSX.Element | null {
 
   return (
     <>
-      {ready && renderEngine ? (
+      {ready && renderer ? (
         <EditorConfigProvider.Provider
           value={{
-            renderEngine: renderEngine,
+            renderer: renderer,
+            project: { name: PROJECT_NAME, stepName: STEP_NAME },
             units: units,
             setUnits: setUnits,
           }}
@@ -110,12 +105,14 @@ export default function App(): JSX.Element | null {
           </Box>
         </EditorConfigProvider.Provider>
       ) : (
-        <Center w={"100%"} h={"100%"} mx="auto">
-          <Loader />
-        </Center>
+        <>
+          <Center w={"100%"} h={"100%"} mx="auto">
+            <Loader />
+          </Center>
+        </>
       )}
       <Skeleton
-        visible={renderEngine == undefined}
+        visible={renderer == undefined}
         style={{
           width: "100%",
           height: "100%",
@@ -142,7 +139,7 @@ export default function App(): JSX.Element | null {
         >
           <div
             id="main"
-            {...{ view: "main" }}
+            ref={viewRef}
             style={{
               width: "100%",
               height: "100%",

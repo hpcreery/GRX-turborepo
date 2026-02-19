@@ -1,15 +1,15 @@
-import { createTheme, MantineProvider } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
-import { Notifications } from "@mantine/notifications"
-import { ContextMenuProvider } from "mantine-contextmenu"
 import ReactDOM from "react-dom/client"
-import App from "./App"
 import { ThemeConfigProvider } from "./contexts/ThemeContext"
-// import DemoApp from "./renderer/demo"
+import { MantineProvider, createTheme } from "@mantine/core"
+import { Notifications } from "@mantine/notifications"
+import { useLocalStorage } from "@mantine/hooks"
+import { ContextMenuProvider } from "mantine-contextmenu"
+import App from "./App"
+// import DemoApp from "./renderer/DEMO"
 // import NCDemo from '@lib/nc/DEMO'
 
 import { Spotlight } from "@mantine/spotlight"
-import { actions, spotlightStore } from "./contexts/Spotlight"
+import { spotlightStore, actions } from "./contexts/Spotlight"
 
 // STYLES
 import "@mantine/core/styles.css"
@@ -18,8 +18,10 @@ import "@mantine/dropzone/styles.css"
 import "@mantine/notifications/styles.css"
 import "@mantine/spotlight/styles.css"
 import "@mantine/code-highlight/styles.css"
+import { JSX } from 'react'
 
 function Main(): JSX.Element | null {
+  // BufferCollection.test()
   const [transparency, setTransparency] = useLocalStorage<boolean>({
     key: "transparency",
     defaultValue: false,

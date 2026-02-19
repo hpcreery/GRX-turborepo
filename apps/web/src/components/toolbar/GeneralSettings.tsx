@@ -1,28 +1,27 @@
-import { ColorPicker, Divider, Flex, Group, Radio, Switch, Text, useMantineColorScheme, useMantineTheme } from "@mantine/core"
-import { useLocalStorage } from "@mantine/hooks"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import React, { JSX } from "react"
 import { ThemeConfigProvider } from "@src/contexts/ThemeContext"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import chroma from "chroma-js"
-import React from "react"
+import { Text, Switch, Divider, Group, Flex, useMantineTheme, useMantineColorScheme, ColorPicker, Radio } from "@mantine/core"
+import { useLocalStorage } from "@mantine/hooks"
 
-type SettingsModalProps = {}
+interface SettingsModalProps {}
 
 export default function GeneralSettingsModal(_props: SettingsModalProps): JSX.Element | null {
-  const { units, setUnits, renderEngine } = React.useContext(EditorConfigProvider)
+  const { units, setUnits, renderer } = React.useContext(EditorConfigProvider)
   const { transparency, setTransparency, setPrimaryColor } = React.useContext(ThemeConfigProvider)
   const theme = useMantineTheme()
   const colors = useMantineColorScheme()
   const [useHiDPI, setUseHiDPI] = useLocalStorage<boolean>({
     key: "engine:USE_HIDPI",
-    defaultValue: renderEngine.canvasSettings.hidpi,
+    defaultValue: renderer.canvasSettings.hidpi,
   })
 
   React.useEffect(() => {
-    // renderEngine.backend.then((backend) => backend.setMeasurementUnits(units))
-    renderEngine.backend.then((backend) => backend.setMeasurementSettings({ units }))
+    renderer.engine.interface.update_measurement_settings({ units })
   }, [units])
   React.useEffect(() => {
-    renderEngine.canvasSettings.hidpi = useHiDPI
+    renderer.canvasSettings.hidpi = useHiDPI
   }, [useHiDPI])
 
   return (
@@ -44,10 +43,10 @@ export default function GeneralSettingsModal(_props: SettingsModalProps): JSX.El
           onChange={(event): void => {
             if (event.currentTarget.checked) {
               colors.setColorScheme("dark")
-              renderEngine.settings.BACKGROUND_COLOR = chroma(theme.colors.dark[8]).alpha(0).gl()
+              renderer.engine.interface.set_engine_settings({ BACKGROUND_COLOR: chroma(theme.colors.dark[8]).alpha(0).gl() })
             } else {
               colors.setColorScheme("light")
-              renderEngine.settings.BACKGROUND_COLOR = chroma(theme.colors.dark[8]).alpha(0).gl()
+              renderer.engine.interface.set_engine_settings({ BACKGROUND_COLOR: chroma(theme.colors.dark[8]).alpha(0).gl() })
             }
           }}
         />

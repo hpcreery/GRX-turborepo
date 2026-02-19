@@ -1,5 +1,5 @@
 import useResizeObserver from "@react-hook/resize-observer"
-import { useLayoutEffect, useState } from "react"
+import { useState, useLayoutEffect } from "react"
 
 interface Size {
   width: number

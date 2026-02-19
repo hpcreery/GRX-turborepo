@@ -1,28 +1,33 @@
-import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
-import type { LayerInfo, QuerySelection } from "@repo/grx-engine/engine"
-import { STANDARD_SYMBOLS, type StandardSymbol } from "@repo/grx-engine/step/layer/shape/symbol/symbol"
-import { type AttributeCollection, FeatureTypeIdentifier, type Units } from "@repo/grx-engine/types"
-import { getUnitsConversion } from "@repo/grx-engine/utils"
-import { PointerEvents } from "@repo/grx-renderer"
-import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
+import { ActionIcon, Affix, Badge, Code, Divider, ScrollArea, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
+import { Card, Text } from "@mantine/core"
+import { useEffect, useState, useContext, type JSX } from "react"
+import { PointerEvents } from "@repo/engine/index"
 import {
-  IconArrowUpBar,
   IconCircle,
   IconLine,
-  IconNorthStar,
-  IconPictureInPicture,
-  IconPolygon,
-  IconQuestionMark,
-  IconReplace,
-  IconShape2,
   IconVectorSpline,
+  IconPolygon,
+  IconShape2,
+  IconQuestionMark,
   IconX,
+  IconPictureInPicture,
+  IconReplace,
+  IconArrowUpBar,
+  IconNorthStar,
 } from "@tabler/icons-react"
-import chroma from "chroma-js"
-import { useContext, useEffect, useState } from "react"
+import type { QuerySelection } from "@repo/engine/engine"
 import classes from "./FeatureSidebar.module.css"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import chroma from "chroma-js"
+import { STANDARD_SYMBOLS, type StandardSymbol } from "@repo/engine/data/shape/symbol/symbol"
+import { type AttributesType, FeatureTypeIdentifier, SymbolTypeIdentifier } from "@repo/engine/types"
+import { menuItems } from "@src/contexts/EditorContext"
+import type { Renderer } from "@repo/engine/index"
+import type { ShapeDistance } from "@repo/engine/view/shape-renderer"
+import type { vec3 } from "gl-matrix"
 
-type ToolbarProps = {}
+interface ToolbarProps {}
 
 function CornerIcon({ children }: { children: JSX.Element }): JSX.Element {
   const [hover, setHover] = useState<boolean>(false)
@@ -48,56 +53,8 @@ function CornerIcon({ children }: { children: JSX.Element }): JSX.Element {
 export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
   const [features, setFeatures] = useState<QuerySelection[]>([])
   const [mounted, setMounted] = useState<boolean>(false)
-  const { units, renderEngine } = useContext(EditorConfigProvider)
-  const [layers, setLayers] = useState<LayerInfo[]>([])
+  const { renderer } = useContext(EditorConfigProvider)
   const theme = useMantineTheme()
-
-  function getSymbolInfo(symbol: StandardSymbol, shapeUnits: Units): (JSX.Element | null)[] {
-    return Object.entries(symbol).map(([key, value], index) => {
-      let representedValue = value
-      if (key === "sym_num" || key === "symbol" || key === "type") return null
-      if (value === 0) return null
-      if (
-        [
-          "width",
-          "height",
-          "corner_radius",
-          "outer_dia",
-          "inner_dia",
-          "line_width",
-          "line_length",
-          "gap",
-          "cut_size",
-          "ring_width",
-          "ring_gap",
-        ].includes(key)
-      ) {
-        representedValue = `${((value * getUnitsConversion(units)) / getUnitsConversion(shapeUnits)).toFixed(3)}${units}`
-      }
-      if (key === "attributes") {
-        return (
-          <>
-            <Text key={index}>
-              - {key}: <Code>{Object.keys(value).length}</Code>
-            </Text>
-            {Object.entries(value as AttributeCollection).map(([key, value]) => (
-              <>
-                <Text key={`${key}`} style={{ whiteSpace: "preserve" }}>
-                  {" "}
-                  ~ {key}: <Code>{value}</Code>
-                </Text>
-              </>
-            ))}
-          </>
-        )
-      }
-      return (
-        <Text key={index}>
-          - {key}: <Code>{representedValue}</Code>
-        </Text>
-      )
-    })
-  }
 
   menuItems.push({
     key: "clear selection",
@@ -106,17 +63,14 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
     onClick: clearSelection,
   })
 
-  function clearSelection(): void {
+  async function clearSelection(): Promise<void> {
     setMounted(false)
-    renderEngine.backend.then(async (engine) => {
-      await engine.clearSelection("main")
-      await engine.render()
-    })
+    await renderer.engine.interface.delete_view_selection("main")
+    await renderer.engine.render()
   }
 
   useEffect(() => {
     const handler = (e): void => {
-      // console.log("feature clicked", (e as CustomEvent<QueryFeature[]>).detail)
       const featuresTemp = (e as CustomEvent<QuerySelection[]>).detail
       if (featuresTemp.length > 0) {
         setMounted(true)
@@ -124,353 +78,12 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
       } else {
         setMounted(false)
       }
-      renderEngine.backend.then((backend) => {
-        backend.getLayers("main").then((layers) => {
-          setLayers(layers)
-        })
-      })
     }
-    renderEngine.pointer.addEventListener(PointerEvents.POINTER_SELECT, handler)
+    renderer.pointer.addEventListener(PointerEvents.POINTER_SELECT, handler)
     return (): void => {
-      renderEngine.pointer.removeEventListener(PointerEvents.POINTER_SELECT, handler)
+      renderer.pointer.removeEventListener(PointerEvents.POINTER_SELECT, handler)
     }
   }, [])
-
-  const getInfo = (selection: QuerySelection): JSX.Element => {
-    const layer = layers.find((x) => x.id === selection.sourceLayer)
-    let layerColor = "black"
-    let layerName = "Unknown"
-    if (layer) {
-      layerColor = chroma.gl(layer.color[0], layer.color[1], layer.color[2]).hex()
-      layerName = layer.name
-    }
-    switch (selection.shape.type) {
-      case FeatureTypeIdentifier.LINE:
-      case FeatureTypeIdentifier.DATUM_LINE:
-        return (
-          <>
-            <CornerIcon>{selection.shape.type == FeatureTypeIdentifier.LINE ? <IconLine /> : <IconArrowUpBar />}</CornerIcon>
-            <Text size="lg" fw={700}>
-              {selection.shape.type == FeatureTypeIdentifier.LINE ? "Line" : "Datum Line"}
-            </Text>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text>
-              Index: <Code>{selection.shape.index}</Code>
-            </Text>
-            <Text>
-              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
-            </Text>
-            <Text>
-              Start:{" "}
-              <Code>
-                X:{((selection.shape.xs * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units} Y:{((selection.shape.ys * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              End:{" "}
-              <Code>
-                X:{((selection.shape.xe * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units} Y:{((selection.shape.ye * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              Symbol: <Code>{STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
-            </Text>
-            <Text>{getSymbolInfo(selection.shape.symbol, selection.units)}</Text>
-            <Text>
-              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
-            </Text>
-            <Text>{getAttributes(selection.shape.attributes)}</Text>
-          </>
-        )
-      case FeatureTypeIdentifier.PAD:
-      case FeatureTypeIdentifier.DATUM_POINT:
-        return (
-          <>
-            {selection.shape.symbol.type == FeatureTypeIdentifier.SYMBOL_DEFINITION
-              ? ""
-              : selection.children.map((child) => (
-                  <>
-                    {getInfo({
-                      sourceLayer: selection.sourceLayer,
-                      units: selection.units,
-                      shape: child.shape,
-                      snapPoint: selection.snapPoint,
-                      children: [],
-                    })}
-                    <Divider my="sm" />
-                  </>
-                ))}
-            <CornerIcon>
-              {selection.shape.type == FeatureTypeIdentifier.DATUM_POINT ? (
-                <IconNorthStar />
-              ) : selection.shape.symbol.type == FeatureTypeIdentifier.SYMBOL_DEFINITION ? (
-                <IconCircle />
-              ) : (
-                <IconPictureInPicture />
-              )}
-            </CornerIcon>
-            <Text size="lg" fw={700}>
-              {selection.shape.type == FeatureTypeIdentifier.DATUM_POINT ? (
-                "Datum Point"
-              ) : selection.shape.symbol.type == FeatureTypeIdentifier.MACRO_DEFINITION ? (
-                <>
-                  Nested in
-                  <br />
-                  Macro Pad
-                </>
-              ) : (
-                "Pad"
-              )}
-            </Text>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text>
-              Index: <Code>{selection.shape.index}</Code>
-            </Text>
-            <Text>
-              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
-            </Text>
-            <Text>
-              Center:{" "}
-              <Code>
-                X:{((selection.shape.x * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units} Y:{((selection.shape.y * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              Resize Factor: <Code>{selection.shape.resize_factor}</Code>
-            </Text>
-            <Text>
-              Mirror:{" "}
-              <Code>
-                X:{selection.shape.mirror_x === 1 ? "yes" : "no"} Y:{selection.shape.mirror_y === 1 ? "yes" : "no"}
-              </Code>
-            </Text>
-            <Text>
-              Rotation (ccw): <Code>{selection.shape.rotation}&deg;</Code>
-            </Text>
-            <Text>
-              Symbol:{" "}
-              <Code>
-                {selection.shape.symbol.type == FeatureTypeIdentifier.SYMBOL_DEFINITION
-                  ? STANDARD_SYMBOLS[selection.shape.symbol.symbol]
-                  : selection.shape.symbol.id}
-              </Code>
-            </Text>
-            {selection.shape.symbol.type == FeatureTypeIdentifier.SYMBOL_DEFINITION ? (
-              <Text>{getSymbolInfo(selection.shape.symbol, selection.units)}</Text>
-            ) : (
-              ""
-            )}
-            <Text>
-              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
-            </Text>
-            <Text>{getAttributes(selection.shape.attributes)}</Text>
-          </>
-        )
-      case FeatureTypeIdentifier.ARC:
-      case FeatureTypeIdentifier.DATUM_ARC:
-        return (
-          <>
-            <CornerIcon>{selection.shape.type == FeatureTypeIdentifier.ARC ? <IconVectorSpline /> : <IconArrowUpBar />}</CornerIcon>
-            <Text size="lg" fw={700}>
-              {selection.shape.type == FeatureTypeIdentifier.ARC ? "Arc" : "Datum Arc"}
-            </Text>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text>
-              Index: <Code>{selection.shape.index}</Code>
-            </Text>
-            <Text>
-              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
-            </Text>
-            <Text>
-              Start:{" "}
-              <Code>
-                X:{((selection.shape.xs * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units} Y:{((selection.shape.ys * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              End:{" "}
-              <Code>
-                X:{((selection.shape.xe * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units} Y:{((selection.shape.ye * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              Center:{" "}
-              <Code>
-                X:{((selection.shape.xc * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units} Y:{((selection.shape.yc * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              Rotation: <Code>{selection.shape.clockwise === 1 ? "clockwise" : "counter clockwise"}</Code>
-            </Text>
-            <Text>
-              Symbol: <Code>{STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
-            </Text>
-            <Text>{getSymbolInfo(selection.shape.symbol, selection.units)}</Text>
-            <Text>
-              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
-            </Text>
-            <Text>{getAttributes(selection.shape.attributes)}</Text>
-          </>
-        )
-      case FeatureTypeIdentifier.SURFACE:
-        return (
-          <>
-            <CornerIcon>
-              <IconPolygon />
-            </CornerIcon>
-            <Text size="lg" fw={700}>
-              Surface
-            </Text>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text>
-              Index: <Code>{selection.shape.index}</Code>
-            </Text>
-            <Text>
-              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
-            </Text>
-            <Text>
-              Islands: <Code>{selection.shape.contours.filter((x) => x.poly_type == 1).length}</Code>
-            </Text>
-            <Text>
-              Holes: <Code>{selection.shape.contours.filter((x) => x.poly_type == 0).length}</Code>
-            </Text>
-            <Text>
-              Edges: <Code>{selection.shape.contours.map((ctr) => ctr.segments.length).reduce((p, c) => p + c, 0)}</Code>
-            </Text>
-            <Text>
-              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
-            </Text>
-            <Text>{getAttributes(selection.shape.attributes)}</Text>
-          </>
-        )
-      case FeatureTypeIdentifier.POLYLINE:
-        return (
-          <>
-            <CornerIcon>
-              <IconShape2 />
-            </CornerIcon>
-            <Text size="lg" fw={700}>
-              Polyline
-            </Text>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text>
-              Index: <Code>{selection.shape.index}</Code>
-            </Text>
-            <Text>
-              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
-            </Text>
-            <Text>
-              Width:{" "}
-              <Code>
-                {((selection.shape.width * getUnitsConversion(units)) / getUnitsConversion(selection.units)).toFixed(3)}
-                {units}
-              </Code>
-            </Text>
-            <Text>
-              End Style: <Code>{selection.shape.pathtype}</Code>
-            </Text>
-            <Text>
-              Corner Style: <Code>{selection.shape.cornertype}</Code>
-            </Text>
-            <Text>
-              Qty Lines: <Code>{selection.shape.lines.length}</Code>
-            </Text>
-            <Text>
-              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
-            </Text>
-            <Text>{getAttributes(selection.shape.attributes)}</Text>
-          </>
-        )
-      case FeatureTypeIdentifier.STEP_AND_REPEAT:
-        return (
-          <>
-            {selection.children.map((child) => (
-              <>
-                {getInfo({
-                  sourceLayer: selection.sourceLayer,
-                  units: selection.units,
-                  shape: child.shape,
-                  snapPoint: selection.snapPoint,
-                  children: [],
-                })}
-                <Divider my="sm" />
-              </>
-            ))}
-            <CornerIcon>
-              <IconReplace />
-            </CornerIcon>
-            <Text size="lg" fw={700}>
-              Nested in
-              <br />
-              Step and Repeat
-            </Text>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text>
-              Index: <Code>{selection.shape.index}</Code>
-            </Text>
-            <Text>
-              Repeats: <Code>{selection.shape.repeats.length}</Code>
-            </Text>
-            <Text>
-              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
-            </Text>
-            <Text>{getAttributes(selection.shape.attributes)}</Text>
-          </>
-        )
-      default:
-        return (
-          <>
-            <CornerIcon>
-              <IconQuestionMark />
-            </CornerIcon>
-            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
-              {layerName}
-            </Badge>
-            <Text size="lg" fw={700}>
-              Unknown
-            </Text>
-          </>
-        )
-    }
-  }
-
-  const getAttributes = (attributes: AttributeCollection): JSX.Element => {
-    return (
-      <>
-        {Object.entries(attributes).map(([key, value]) => (
-          <>
-            <Text key={`${key}`}>
-              - {key}: <Code>{value}</Code>
-            </Text>
-          </>
-        ))}
-      </>
-    )
-  }
 
   return (
     <Transition mounted={mounted} transition="slide-left" duration={400} exitDuration={400} timingFunction="ease">
@@ -509,7 +122,8 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
               >
                 <ScrollArea scrollbars="x" offsetScrollbars>
                   <Text size="xs" truncate="end">
-                    {getInfo(feature)}
+                    {/* {getInfo(feature)} */}
+                    <FeatureInfo layer={feature.sourceLayer} renderer={renderer} selection={feature} />
                   </Text>
                 </ScrollArea>
               </Card>
@@ -524,4 +138,383 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
       )}
     </Transition>
   )
+}
+
+interface FeatureInfoProps {
+  layer: string
+  selection: ShapeDistance
+  renderer: Renderer
+}
+
+function FeatureInfo(props: FeatureInfoProps): JSX.Element {
+  const { units, renderer } = useContext(EditorConfigProvider)
+  const [color, setColor] = useState<vec3>([0, 0, 0])
+  const { layer, selection } = props
+
+  useEffect(() => {
+    renderer.engine.interface.read_view_layer_color("main", layer).then((color) => {
+      setColor(color)
+    })
+  }, [layer])
+
+  const layerColor = chroma.gl(color[0], color[1], color[2]).hex()
+
+  function getSymbolInfo(symbol: StandardSymbol): (JSX.Element | null)[] {
+    return Object.entries(symbol).map(([key, value], index) => {
+      let representedValue = value
+      if (key === "sym_num" || key === "symbol" || key === "type") return null
+      if (value === 0) return null
+      if (
+        [
+          "width",
+          "height",
+          "corner_radius",
+          "outer_dia",
+          "inner_dia",
+          "line_width",
+          "line_length",
+          "gap",
+          "cut_size",
+          "ring_width",
+          "ring_gap",
+        ].includes(key)
+      ) {
+        representedValue = `${(value / baseUnitsConversionFactor(units)).toFixed(3)}${units}`
+      }
+      if (key === "attributes") {
+        return (
+          <>
+            <Text key={index}>
+              - {key}: <Code>{Object.keys(value).length}</Code>
+            </Text>
+            {Object.entries(value as AttributesType).map(([key, value]) => (
+              <>
+                <Text key={`${key}`} style={{ whiteSpace: "preserve" }}>
+                  {" "}
+                  ~ {key}: <Code>{value}</Code>
+                </Text>
+              </>
+            ))}
+          </>
+        )
+      }
+      return (
+        <Text key={index}>
+          - {key}: <Code>{representedValue}</Code>
+        </Text>
+      )
+    })
+  }
+  const getAttributes = (attributes: AttributesType): JSX.Element => {
+    return (
+      <>
+        {Object.entries(attributes).map(([key, value]) => (
+          <>
+            <Text key={`${key}`}>
+              - {key}: <Code>{value}</Code>
+            </Text>
+          </>
+        ))}
+      </>
+    )
+  }
+  const getInfo = (): JSX.Element => {
+    switch (selection.shape.type) {
+      case FeatureTypeIdentifier.LINE:
+      case FeatureTypeIdentifier.DATUM_LINE:
+        return (
+          <>
+            <CornerIcon>{selection.shape.type == FeatureTypeIdentifier.LINE ? <IconLine /> : <IconArrowUpBar />}</CornerIcon>
+            <Text size="lg" fw={700}>
+              {selection.shape.type == FeatureTypeIdentifier.LINE ? "Line" : "Datum Line"}
+            </Text>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text>
+              Index: <Code>{selection.shape.index}</Code>
+            </Text>
+            <Text>
+              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
+            </Text>
+            <Text>
+              Start:{" "}
+              <Code>
+                X:{(selection.shape.xs / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ys / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              End:{" "}
+              <Code>
+                X:{(selection.shape.xe / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ye / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              Symbol: <Code>{STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
+            </Text>
+            <Text>{getSymbolInfo(selection.shape.symbol)}</Text>
+            <Text>
+              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
+            </Text>
+            <Text>{getAttributes(selection.shape.attributes)}</Text>
+          </>
+        )
+      case FeatureTypeIdentifier.PAD:
+      case FeatureTypeIdentifier.DATUM_POINT:
+        return (
+          <>
+            {selection.shape.symbol.type == SymbolTypeIdentifier.SYMBOL_DEFINITION
+              ? ""
+              : selection.children.map((child) => (
+                  <>
+                    <FeatureInfo layer={layer} selection={child} renderer={renderer} />
+                    <Divider my="sm" />
+                  </>
+                ))}
+            <CornerIcon>
+              {selection.shape.type == FeatureTypeIdentifier.DATUM_POINT ? (
+                <IconNorthStar />
+              ) : selection.shape.symbol.type == SymbolTypeIdentifier.SYMBOL_DEFINITION ? (
+                <IconCircle />
+              ) : (
+                <IconPictureInPicture />
+              )}
+            </CornerIcon>
+            <Text size="lg" fw={700}>
+              {selection.shape.type == FeatureTypeIdentifier.DATUM_POINT ? (
+                "Datum Point"
+              ) : selection.shape.symbol.type == SymbolTypeIdentifier.MACRO_DEFINITION ? (
+                <>
+                  Nested in
+                  <br />
+                  Macro Pad
+                </>
+              ) : (
+                <>Pad</>
+              )}
+            </Text>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text>
+              Index: <Code>{selection.shape.index}</Code>
+            </Text>
+            <Text>
+              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
+            </Text>
+            <Text>
+              Center:{" "}
+              <Code>
+                X:{(selection.shape.x / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.y / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              Resize Factor: <Code>{selection.shape.resize_factor}</Code>
+            </Text>
+            <Text>
+              Mirror:{" "}
+              <Code>
+                X:{selection.shape.mirror_x === 1 ? "yes" : "no"} Y:{selection.shape.mirror_y === 1 ? "yes" : "no"}
+              </Code>
+            </Text>
+            <Text>
+              Rotation (ccw): <Code>{selection.shape.rotation}&deg;</Code>
+            </Text>
+            <Text>
+              Symbol:{" "}
+              <Code>
+                {selection.shape.symbol.type == SymbolTypeIdentifier.SYMBOL_DEFINITION
+                  ? STANDARD_SYMBOLS[selection.shape.symbol.symbol]
+                  : selection.shape.symbol.id}
+              </Code>
+            </Text>
+            {selection.shape.symbol.type == SymbolTypeIdentifier.SYMBOL_DEFINITION ? <Text>{getSymbolInfo(selection.shape.symbol)}</Text> : ""}
+            <Text>
+              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
+            </Text>
+            <Text>{getAttributes(selection.shape.attributes)}</Text>
+          </>
+        )
+      case FeatureTypeIdentifier.ARC:
+      case FeatureTypeIdentifier.DATUM_ARC:
+        return (
+          <>
+            <CornerIcon>{selection.shape.type == FeatureTypeIdentifier.ARC ? <IconVectorSpline /> : <IconArrowUpBar />}</CornerIcon>
+            <Text size="lg" fw={700}>
+              {selection.shape.type == FeatureTypeIdentifier.ARC ? "Arc" : "Datum Arc"}
+            </Text>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text>
+              Index: <Code>{selection.shape.index}</Code>
+            </Text>
+            <Text>
+              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
+            </Text>
+            <Text>
+              Start:{" "}
+              <Code>
+                X:{(selection.shape.xs / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ys / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              End:{" "}
+              <Code>
+                X:{(selection.shape.xe / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ye / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              Center:{" "}
+              <Code>
+                X:{(selection.shape.xc / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.yc / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              Rotation: <Code>{selection.shape.clockwise === 1 ? "clockwise" : "counter clockwise"}</Code>
+            </Text>
+            <Text>
+              Symbol: <Code>{STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
+            </Text>
+            <Text>{getSymbolInfo(selection.shape.symbol)}</Text>
+            <Text>
+              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
+            </Text>
+            <Text>{getAttributes(selection.shape.attributes)}</Text>
+          </>
+        )
+      case FeatureTypeIdentifier.SURFACE:
+        return (
+          <>
+            <CornerIcon>
+              <IconPolygon />
+            </CornerIcon>
+            <Text size="lg" fw={700}>
+              Surface
+            </Text>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text>
+              Index: <Code>{selection.shape.index}</Code>
+            </Text>
+            <Text>
+              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
+            </Text>
+            <Text>
+              Islands: <Code>{selection.shape.contours.filter((x) => x.poly_type == 1).length}</Code>
+            </Text>
+            <Text>
+              Holes: <Code>{selection.shape.contours.filter((x) => x.poly_type == 0).length}</Code>
+            </Text>
+            <Text>
+              Edges: <Code>{selection.shape.contours.map((ctr) => ctr.segments.length).reduce((p, c) => p + c, 0)}</Code>
+            </Text>
+            <Text>
+              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
+            </Text>
+            <Text>{getAttributes(selection.shape.attributes)}</Text>
+          </>
+        )
+      case FeatureTypeIdentifier.POLYLINE:
+        return (
+          <>
+            <CornerIcon>
+              <IconShape2 />
+            </CornerIcon>
+            <Text size="lg" fw={700}>
+              Polyline
+            </Text>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text>
+              Index: <Code>{selection.shape.index}</Code>
+            </Text>
+            <Text>
+              Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
+            </Text>
+            <Text>
+              Width:{" "}
+              <Code>
+                {(selection.shape.width / baseUnitsConversionFactor(units)).toFixed(3)}
+                {units}
+              </Code>
+            </Text>
+            <Text>
+              End Style: <Code>{selection.shape.pathtype}</Code>
+            </Text>
+            <Text>
+              Corner Style: <Code>{selection.shape.cornertype}</Code>
+            </Text>
+            <Text>
+              Qty Lines: <Code>{selection.shape.lines.length}</Code>
+            </Text>
+            <Text>
+              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
+            </Text>
+            <Text>{getAttributes(selection.shape.attributes)}</Text>
+          </>
+        )
+      case FeatureTypeIdentifier.STEP_AND_REPEAT:
+        return (
+          <>
+            {selection.children.map((child) => (
+              <>
+                <FeatureInfo layer={layer} selection={child} renderer={renderer} />
+                <Divider my="sm" />
+              </>
+            ))}
+            <CornerIcon>
+              <IconReplace />
+            </CornerIcon>
+            <Text size="lg" fw={700}>
+              Nested in
+              <br />
+              Step and Repeat
+            </Text>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text>
+              Index: <Code>{selection.shape.index}</Code>
+            </Text>
+            <Text>
+              Repeats: <Code>{selection.shape.repeats.length}</Code>
+            </Text>
+            <Text>
+              Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
+            </Text>
+            <Text>{getAttributes(selection.shape.attributes)}</Text>
+          </>
+        )
+      default:
+        return (
+          <>
+            <CornerIcon>
+              <IconQuestionMark />
+            </CornerIcon>
+            <Badge style={{ marginBottom: "4px" }} autoContrast fullWidth radius="sm" color={layerColor}>
+              {layer}
+            </Badge>
+            <Text size="lg" fw={700}>
+              Unknown
+            </Text>
+          </>
+        )
+    }
+  }
+  return getInfo()
 }

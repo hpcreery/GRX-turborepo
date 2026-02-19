@@ -1,16 +1,21 @@
-import type { Units } from "@repo/grx-engine/types"
-import { RenderEngine } from "@repo/grx-renderer"
-import type { ContextMenuItemOptions } from "mantine-contextmenu"
 import React from "react"
+import { ContextMenuItemOptions } from "mantine-contextmenu"
+import { Units } from "@repo/engine/types"
+import { Renderer } from "@repo/engine/index"
 
 export interface EditorContext {
-  renderEngine: RenderEngine
+  renderer: Renderer
+  project: {
+    name: string
+    stepName: string
+  }
   units: Units
   setUnits: React.Dispatch<React.SetStateAction<Units>>
 }
 
 export const EditorConfigProvider = React.createContext<EditorContext>({
-  renderEngine: new RenderEngine({ container: document.createElement("div") }),
+  renderer: new Renderer({ container: document.createElement("div") }),
+  project: { name: "main", stepName: "main" },
   units: "mm",
   setUnits: () => {},
 })

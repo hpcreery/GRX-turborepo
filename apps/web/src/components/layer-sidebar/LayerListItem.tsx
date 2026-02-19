@@ -1,58 +1,61 @@
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { Button, ColorPicker, Popover, Tooltip, useMantineColorScheme, useMantineTheme } from "@mantine/core"
-import { notifications } from "@mantine/notifications"
-import { animated, type SpringValue, useSpring } from "@react-spring/web"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-import type { LayerInfo } from "@src/renderer/engine/engine"
+import { useState, useEffect, useContext, JSX } from "react"
+import { Button, Popover, ColorPicker, useMantineTheme, Tooltip, useMantineColorScheme, Input } from "@mantine/core"
+import chroma from "chroma-js"
+import { useGesture } from "@use-gesture/react"
+import { animated, SpringValue, useSpring } from "@react-spring/web"
 import {
-  IconCircleDotted,
   IconCircleFilled,
-  IconClearAll,
-  IconColorPicker,
-  IconContrast,
-  IconContrastOff,
+  IconCircleDotted,
+  IconTrashX,
+  IconPerspective,
   IconEye,
   IconEyeOff,
+  IconColorPicker,
+  IconContrastOff,
+  IconContrast,
+  IconClearAll,
   IconGripVertical,
-  IconPerspective,
-  IconTrashX,
+  IconCursorText,
+  IconCheck,
 } from "@tabler/icons-react"
-import { useGesture } from "@use-gesture/react"
-import type { ReactDOMAttributes } from "@use-gesture/react/dist/declarations/src/types"
-import chroma from "chroma-js"
-import * as Comlink from "comlink"
+import { ContextMenuContent, ShowContextMenuFunction, useContextMenu } from "mantine-contextmenu"
 import { vec3 } from "gl-matrix"
-import { type ContextMenuContent, type ShowContextMenuFunction, useContextMenu } from "mantine-contextmenu"
-import { useContext, useEffect, useState } from "react"
-import type { UploadFile } from "./LayersSidebar"
 import LayerTransform from "./transform/LayerTransform"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
+
+import { CSS } from "@dnd-kit/utilities"
+import { useSortable } from "@dnd-kit/sortable"
+import { ReactDOMAttributes } from "@use-gesture/react/dist/declarations/src/types"
+
+interface LayerActions {
+  download: () => void
+  preview: () => void
+  remove: (layer: string) => Promise<void>
+  hideAll: () => void
+  showAll: () => void
+  deleteAll: () => void
+  rename: (oldName: string, newName: string) => Promise<void>
+}
 
 interface LayerListItemProps {
-  file: UploadFile
-  actions: {
-    download: () => void
-    preview: () => void
-    remove: (file: UploadFile) => Promise<void>
-    hideAll: () => void
-    showAll: () => void
-    deleteAll: () => void
-  }
+  layer: string
+  actions: LayerActions
 }
 
 export default function LayerListItem(props: LayerListItemProps): JSX.Element | null {
-  const { renderEngine } = useContext(EditorConfigProvider)
+  const { renderer } = useContext(EditorConfigProvider)
   const { showContextMenu } = useContextMenu()
-  const { file, actions } = props
+  // const { file, actions } = props
+  const { actions, layer } = props
   const [{ width }, api] = useSpring(() => ({ x: 0, y: 0, width: 0 }))
   const [color, setColor] = useState<vec3>(vec3.fromValues(0.5, 0.5, 0.5))
   const [colorPickerVisible, setColorPickerVisible] = useState<boolean>(false)
   const [layerTransformVisible, setLayerTransformVisible] = useState<boolean>(false)
 
   async function changeColor(color: vec3): Promise<void> {
-    const renderer = await renderEngine.backend
-    if (!renderer) return
-    await renderer.setLayerProps("main", file.id, { color })
+    const engine = await renderer.engine
+    if (!engine) return
+    await engine.interface.update_view_layer_color("main", layer, color)
     setColor(color)
   }
 
@@ -88,10 +91,11 @@ export default function LayerListItem(props: LayerListItemProps): JSX.Element | 
   return (
     <Popover position="right" withArrow trapFocus shadow="md" opened={colorPickerVisible} onChange={setColorPickerVisible}>
       <DraggableLayer
+        key={layer}
         actions={actions}
         setLayerTransformVisible={setLayerTransformVisible}
         showContextMenu={showContextMenu}
-        file={file}
+        layer={layer}
         bind={bind}
         setColor={setColor}
         color={color}
@@ -132,14 +136,14 @@ export default function LayerListItem(props: LayerListItemProps): JSX.Element | 
           ]}
         />
       </Popover.Dropdown>
-      <LayerTransform layerID={file.id} visible={layerTransformVisible} onClose={() => setLayerTransformVisible(false)} />
+      <LayerTransform layerID={layer} visible={layerTransformVisible} onClose={() => setLayerTransformVisible(false)} />
     </Popover>
   )
 }
 
 interface DraggableLayerProps {
   showContextMenu: ShowContextMenuFunction
-  file: UploadFile
+  layer: string
   bind: () => ReactDOMAttributes
   color: vec3
   setColor: (color: vec3) => void
@@ -147,20 +151,13 @@ interface DraggableLayerProps {
   colorPickerVisible: boolean
   width: SpringValue<number>
   setLayerTransformVisible: (visible: boolean) => void
-  actions: {
-    download: () => void
-    preview: () => void
-    remove: (file: UploadFile) => Promise<void>
-    hideAll: () => void
-    showAll: () => void
-    deleteAll: () => void
-  }
+  actions: LayerActions
 }
 
 function DraggableLayer(props: DraggableLayerProps): JSX.Element {
   const {
     showContextMenu,
-    file,
+    layer,
     bind,
     setColorPickerVisible: setShowColorPicker,
     color,
@@ -170,30 +167,39 @@ function DraggableLayer(props: DraggableLayerProps): JSX.Element {
     setLayerTransformVisible,
     actions,
   } = props
-  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.file.id })
+  const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id: props.layer })
   const theme = useMantineTheme()
   const colors = useMantineColorScheme()
   const [visible, setVisible] = useState<boolean>(false)
-  const [loading, setLoading] = useState<boolean>(true)
-  const { renderEngine } = useContext(EditorConfigProvider)
+  const { renderer } = useContext(EditorConfigProvider)
+  const [editing, setEditing] = useState<string | undefined>(undefined)
+  const [renameError, setRenameError] = useState<boolean>(false)
 
   function deleteLayer(): void {
-    actions.remove(file)
+    actions.remove(layer)
   }
 
   async function toggleVisible(): Promise<void> {
-    const renderer = await renderEngine.backend
-    if (!renderer) return
+    const engine = await renderer.engine
+    if (!engine) return
     if (visible) {
-      renderer.setLayerProps("main", file.id, { visible: false })
+      engine.interface.update_view_layer_visibility("main", layer, false)
       setVisible(false)
     } else {
-      renderer.setLayerProps("main", file.id, { visible: true })
+      engine.interface.update_view_layer_visibility("main", layer, true)
       setVisible(true)
     }
   }
 
   const items: ContextMenuContent = [
+    {
+      title: "Rename Layer",
+      key: "0",
+      icon: <IconCursorText stroke={1.5} size={18} />,
+      onClick: (): void => {
+        setEditing(layer)
+      },
+    },
     {
       title: "Change Color",
       key: "1",
@@ -259,91 +265,41 @@ function DraggableLayer(props: DraggableLayerProps): JSX.Element {
     },
   ]
 
-  function registerLayers(rendererLayers: LayerInfo[]): void {
-    // console.log("registerlayers", rendererLayers, file.id)
-    const thisLayer = rendererLayers.find((l) => l.id === file.id)
-    if (thisLayer) {
-      setColor(thisLayer.color)
-      setVisible(thisLayer.visible)
-      // setzIndex(thisLayer.zIndex)
-      setLoading(false)
+  async function getLayerColor(): Promise<void> {
+    const newColor = await renderer.engine.interface.read_view_layer_color("main", layer)
+    if (newColor[0] !== color[0] || newColor[1] !== color[1] || newColor[2] !== color[2]) {
+      setColor(newColor)
+    }
+  }
+
+  async function getLayerVisibility(): Promise<void> {
+    const newVisible = await renderer.engine.interface.read_view_layer_visibility("main", layer)
+    if (newVisible !== visible) {
+      setVisible(newVisible)
     }
   }
 
   useEffect(() => {
-    renderEngine.backend.then(async (renderer) => {
-      const layers = await renderer.getLayers("main")
-      registerLayers(layers)
-      if (layers.find((l) => l.id === file.id)) {
-        setLoading(false)
-        return
-      }
-
-      const reader = new FileReader()
-      reader.onerror = (err): void => {
-        console.error(err, `${file.name} Error reading file.`)
-        notifications.show({
-          title: "Error reading file",
-          message: `${file.name} Error reading file.`,
-          color: "red",
-          autoClose: 5000,
-        })
-      }
-      reader.onabort = (err): void => {
-        console.warn(err, `${file.name} File read aborted.`)
-        notifications.show({
-          title: "File read aborted",
-          message: `${file.name} File read aborted.`,
-          color: "red",
-          autoClose: 5000,
-        })
-      }
-      reader.onprogress = (e): void => {
-        const percent = Math.round((e.loaded / e.total) * 100)
-        console.info(`${file.name} ${percent}% read`)
-      }
-      reader.onload = async (_e): Promise<void> => {
-        if (reader.result !== null && reader.result !== undefined) {
-          try {
-            console.time(`${file.name} file parse time`)
-            await renderer.addFile("main", Comlink.transfer(reader.result as ArrayBuffer, [reader.result as ArrayBuffer]), {
-              format: file.format,
-              props: {
-                name: file.name,
-                id: file.id,
-              },
-            })
-            console.timeEnd(`${file.name} file parse time`)
-            // notifications.show({
-            //   title: 'File read',
-            //   message: `${file.name} file read.`,
-            //   color: 'green',
-            //   autoClose: 5000
-            // })
-          } catch (fileParseError) {
-            console.error(fileParseError)
-            notifications.show({
-              title: "File parse error",
-              message: `${file.name} file parse error.`,
-              color: "red",
-              autoClose: 5000,
-            })
-          }
-          registerLayers(await renderer.getLayers("main"))
-        } else {
-          notifications.show({
-            title: "File upload failed",
-            message: `${file.name} file upload failed.`,
-            color: "red",
-            autoClose: 5000,
-          })
-        }
-      }
-      reader.readAsArrayBuffer(file)
-    })
+    getLayerColor()
+    getLayerVisibility()
 
     return (): void => {}
-  }, [])
+  })
+
+  const rename = (): void => {
+    if (editing === "") {
+      setEditing(undefined)
+      return
+    }
+    actions
+      .rename(layer, editing!)
+      .then(() => {
+        setEditing(undefined)
+      })
+      .catch(() => {
+        setRenameError(true)
+      })
+  }
 
   return (
     <div
@@ -355,75 +311,106 @@ function DraggableLayer(props: DraggableLayerProps): JSX.Element {
       }}
       ref={setNodeRef}
     >
-      <animated.div {...bind()} style={{ width: "100%", overflow: "hidden", touchAction: "none", overscrollBehaviorX: "none" }}>
-        <Tooltip label={file.name} withArrow openDelay={1000} transitionProps={{ transition: "slide-up", duration: 300 }}>
-          <Popover.Target>
-            <Button
-              style={{
-                textAlign: "left",
-                width: "100%",
-                overflow: "hidden",
-                overscrollBehaviorX: "none",
-                padding: 0,
-                paddingLeft: 0,
-              }}
-              variant="default"
-              color={colors.colorScheme === "dark" ? theme.colors.gray[1] : theme.colors.gray[9]}
-              radius="sm"
-              leftSection={
-                <>
-                  <IconGripVertical size={14} {...attributes} {...listeners} />
-                  {visible ? (
-                    <IconCircleFilled
-                      size={18}
-                      style={{
-                        color: chroma.gl(color[0], color[1], color[2]).hex(),
-                      }}
-                      onClick={(e): void => {
-                        e.stopPropagation()
-                        setShowColorPicker(!showColorPicker)
-                      }}
-                    />
-                  ) : (
-                    <IconCircleDotted
-                      size={18}
-                      style={{
-                        color: chroma.gl(color[0], color[1], color[2]).hex(),
-                      }}
-                      onClick={(e): void => {
-                        e.stopPropagation()
-                        setShowColorPicker(!showColorPicker)
-                      }}
-                    />
-                  )}
-                </>
-              }
-              justify="flex-start"
-              onClick={(): void => {
-                toggleVisible()
-              }}
-              loading={loading}
-            >
-              {file.name}
-            </Button>
-          </Popover.Target>
-        </Tooltip>
-      </animated.div>
-      <animated.div {...bind()} style={{ width }}>
-        <Button
-          radius="sm"
-          style={{ padding: 0, width: `calc(100% - 4px)`, overflow: "hidden", marginLeft: 4 }}
-          leftSection={<IconTrashX style={{ color: theme.colors.red[7] }} stroke={1.5} size={18} />}
-          onClick={deleteLayer}
-          variant="default"
-          color="gray"
-          styles={{
-            section: {
-              margin: 0,
-            },
+      {editing != undefined ? (
+        <Input
+          style={{
+            textAlign: "left",
+            width: "100%",
+            overflow: "hidden",
+            overscrollBehaviorX: "none",
+            padding: 0,
+            paddingLeft: 0,
           }}
+          autoFocus
+          error={renameError}
+          radius="sm"
+          value={editing}
+          placeholder={layer}
+          onBlur={rename}
+          onChange={(e): void => setEditing(e.target.value)}
+          onKeyDown={(e): void => {
+            if (e.key === "Enter") {
+              rename()
+            } else if (e.key === "Escape") {
+              setEditing(undefined)
+            }
+          }}
+          rightSectionPointerEvents="auto"
+          rightSection={<IconCheck aria-label="Accept" onClick={rename} style={{ display: editing ? undefined : "none", cursor: "pointer" }} />}
         />
-      </animated.div>
+      ) : (
+        <>
+          <animated.div {...bind()} style={{ width: "100%", overflow: "hidden", touchAction: "none", overscrollBehaviorX: "none" }}>
+            <Tooltip label={layer} withArrow openDelay={1000} transitionProps={{ transition: "slide-up", duration: 300 }}>
+              <Popover.Target>
+                <Button
+                  style={{
+                    textAlign: "left",
+                    width: "100%",
+                    overflow: "hidden",
+                    overscrollBehaviorX: "none",
+                    padding: 0,
+                    paddingLeft: 0,
+                  }}
+                  variant="default"
+                  color={colors.colorScheme === "dark" ? theme.colors.gray[1] : theme.colors.gray[9]}
+                  radius="sm"
+                  leftSection={
+                    <>
+                      <IconGripVertical size={14} {...attributes} {...listeners} />
+                      {visible ? (
+                        <IconCircleFilled
+                          size={18}
+                          style={{
+                            color: chroma.gl(color[0], color[1], color[2]).hex(),
+                          }}
+                          onClick={(e): void => {
+                            e.stopPropagation()
+                            setShowColorPicker(!showColorPicker)
+                          }}
+                        />
+                      ) : (
+                        <IconCircleDotted
+                          size={18}
+                          style={{
+                            color: chroma.gl(color[0], color[1], color[2]).hex(),
+                          }}
+                          onClick={(e): void => {
+                            e.stopPropagation()
+                            setShowColorPicker(!showColorPicker)
+                          }}
+                        />
+                      )}
+                    </>
+                  }
+                  justify="flex-start"
+                  onClick={(): void => {
+                    toggleVisible()
+                  }}
+                  // loading={loading}
+                >
+                  {layer}
+                </Button>
+              </Popover.Target>
+            </Tooltip>
+          </animated.div>
+          <animated.div {...bind()} style={{ width }}>
+            <Button
+              radius="sm"
+              style={{ padding: 0, width: `calc(100% - 4px)`, overflow: "hidden", marginLeft: 4 }}
+              leftSection={<IconTrashX style={{ color: theme.colors.red[7] }} stroke={1.5} size={18} />}
+              onClick={deleteLayer}
+              variant="default"
+              color="gray"
+              styles={{
+                section: {
+                  margin: 0,
+                },
+              }}
+            />
+          </animated.div>
+        </>
+      )}
     </div>
   )
 }

@@ -1,16 +1,19 @@
-import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
-import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-import { Button, Group, Input, Modal, NumberInput, Paper, Space, Stack, Switch } from "@mantine/core"
-import type { LayerInfo } from "@repo/grx-engine/engine"
-import type { TransformOrder } from "@repo/grx-engine/transform"
-import type { Binary } from "@repo/grx-engine/types"
-import { getUnitsConversion } from "@repo/grx-engine/utils"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-import { IconGripHorizontal } from "@tabler/icons-react"
+import { useState, useEffect, useContext, JSX } from "react"
+import { Group, Modal, NumberInput, Switch, Space, Button, Stack, Paper, Input } from "@mantine/core"
+import { Binary } from "@repo/engine/types"
+import { TransformOrder } from "@repo/engine/transform"
+// import type { LayerInfo } from "@repo/engine/engine"
 import { vec2 } from "gl-matrix"
-import { useContext, useEffect, useState } from "react"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
+
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+
+import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { IconGripHorizontal } from "@tabler/icons-react"
+import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifiers"
 
 export interface LayerTransformProps {
   layerID: string
@@ -43,7 +46,7 @@ export default function LayerTransform(props: LayerTransformProps): JSX.Element 
 
   const [transformOrder, setTransformOrder] = useState<TransformOrder>(["translate", "rotate", "mirror", "scale"])
 
-  const { units, renderEngine } = useContext(EditorConfigProvider)
+  const { units, renderer } = useContext(EditorConfigProvider)
   const [layerName, setLayerName] = useState<string>("")
 
   const sensors = useSensors(
@@ -68,49 +71,40 @@ export default function LayerTransform(props: LayerTransformProps): JSX.Element 
     }
   }
 
-  useEffect(() => {
-    renderEngine.backend.then((backend) => {
-      backend.getLayers("main").then((layers: LayerInfo[]) => {
-        layers.forEach((layer: LayerInfo) => {
-          if (layer.id === props.layerID) {
-            setLayerName(layer.name)
-            setDatumX(layer.transform.datum[0])
-            setDatumY(layer.transform.datum[1])
-            setRotation(layer.transform.rotation)
-            setScale(layer.transform.scale)
-            setMirrorX(layer.transform.mirror_x)
-            setMirrorY(layer.transform.mirror_y)
-            if (layer.transform.order != undefined) {
-              setTransformOrder(layer.transform.order)
-            } else {
-              setTransformOrder(["translate", "rotate", "mirror", "scale"])
-            }
-          }
-        })
-      })
-    })
-    return (): void => {
-      console.log("LayerTransform Unloaded")
+  async function getLayerTransform(): Promise<void> {
+    const transform = await renderer.engine.interface.read_view_layer_transform("main", props.layerID)
+    setLayerName(props.layerID)
+    setDatumX(transform.datum[0])
+    setDatumY(transform.datum[1])
+    setRotation(transform.rotation)
+    setScale(transform.scale)
+    setMirrorX(transform.mirror_x)
+    setMirrorY(transform.mirror_y)
+    if (transform.order != undefined) {
+      setTransformOrder(transform.order)
+    } else {
+      setTransformOrder(["translate", "rotate", "mirror", "scale"])
     }
+  }
+
+  async function setLayerTransform(): Promise<void> {
+    await renderer.engine.interface.update_view_layer_transform("main", props.layerID, {
+      datum: vec2.fromValues(datumX, datumY),
+      rotation: rotation,
+      scale: scale,
+      mirror_x: mirror_x,
+      mirror_y: mirror_y,
+      order: transformOrder,
+    })
+    await renderer.engine.render()
+  }
+
+  useEffect(() => {
+    getLayerTransform()
   }, [])
 
   useEffect(() => {
-    renderEngine.backend.then((backend) => {
-      backend.getLayers("main").then((layers: LayerInfo[]) => {
-        layers.forEach((layer: LayerInfo) => {
-          if (layer.id === props.layerID) {
-            backend.setLayerTransform("main", layer.id, {
-              datum: vec2.fromValues(datumX, datumY),
-              rotation: rotation,
-              scale: scale,
-              mirror_x: mirror_x,
-              mirror_y: mirror_y,
-              order: transformOrder,
-            })
-          }
-        })
-      })
-    })
+    setLayerTransform()
   })
 
   const roundToThree = (num: number): number => {
@@ -124,17 +118,17 @@ export default function LayerTransform(props: LayerTransformProps): JSX.Element 
           label={`Datum X (${units})`}
           description="Layer X translation"
           placeholder="Input number"
-          value={roundToThree(datumX * getUnitsConversion(units))}
+          value={roundToThree(datumX * baseUnitsConversionFactor(units))}
           step={1}
-          onChange={(x) => setDatumX(roundToThree(Number(x) / getUnitsConversion(units)))}
+          onChange={(x) => setDatumX(roundToThree(Number(x) / baseUnitsConversionFactor(units)))}
         />
         <NumberInput
           label={`Datum Y (${units})`}
           description="Layer Y translation"
           placeholder="Input number"
-          value={roundToThree(datumY * getUnitsConversion(units))}
+          value={roundToThree(datumY * baseUnitsConversionFactor(units))}
           step={1}
-          onChange={(y) => setDatumY(roundToThree(Number(y) / getUnitsConversion(units)))}
+          onChange={(y) => setDatumY(roundToThree(Number(y) / baseUnitsConversionFactor(units)))}
         />
       </Group>
       <Space h="md" />
