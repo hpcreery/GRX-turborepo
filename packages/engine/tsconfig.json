@@ -2,7 +2,7 @@
   // "extends": "@repo/typescript-config/base.json",
   "extends": "@repo/typescript-config/vite.json",
   "compilerOptions": {
-    "lib": ["esnext", "dom"],
+    "lib": ["esnext", "dom", "dom.iterable"],
     "outDir": "./dist",
     "declaration": true,
     "declarationMap": true,

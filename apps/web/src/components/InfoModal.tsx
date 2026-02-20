@@ -1,9 +1,9 @@
-import { Modal, ActionIcon, Accordion, Text, Anchor, Table, Paper, TableData, Kbd, Space, Title } from "@mantine/core"
+import { Accordion, ActionIcon, Anchor, Kbd, Modal, Paper, Space, Table, type TableData, Text, Title } from "@mantine/core"
 import { useDisclosure } from "@mantine/hooks"
-import { IconUserQuestion } from "@tabler/icons-react"
 import { actions } from "@src/contexts/Spotlight"
+import { IconUserQuestion } from "@tabler/icons-react"
+import type { JSX } from "react"
 import EngineStats from "./toolbar/EngineStats"
-import { JSX } from 'react'
 
 export default function InfoModal(): JSX.Element | null {
   const [helpModalOpen, { open, close }] = useDisclosure(false)
@@ -48,7 +48,7 @@ export default function InfoModal(): JSX.Element | null {
         <Space h="lg" />
         <Title order={5}>Keyboard Shortcuts:</Title>
         <Paper shadow="xs" p="0" withBorder>
-          <Table data={tableData} captionSide="top" verticalSpacing="xs" highlightOnHover withRowBorders={false}/>
+          <Table data={tableData} captionSide="top" verticalSpacing="xs" highlightOnHover withRowBorders={false} />
         </Paper>
         <Space h="lg" />
         <Accordion variant="contained" defaultValue="customization">

@@ -1,12 +1,12 @@
-import { useEffect, useContext, JSX } from "react"
 import { Kbd, SegmentedControl } from "@mantine/core"
-import { IconPointerPin } from "@tabler/icons-react"
-import { SnapMode, SNAP_MODES } from "@repo/engine/types"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
-import { actions } from "@src/contexts/Spotlight"
+import { SNAP_MODES, SnapMode } from "@repo/engine/types"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { actions } from "@src/contexts/Spotlight"
+import { IconPointerPin } from "@tabler/icons-react"
+import { type JSX, useContext, useEffect } from "react"
 
-interface SnapSettingsProps {}
+type SnapSettingsProps = {}
 
 export default function SnapSettings(_props: SnapSettingsProps): JSX.Element | null {
   const { renderer } = useContext(EditorConfigProvider)
@@ -17,7 +17,7 @@ export default function SnapSettings(_props: SnapSettingsProps): JSX.Element | n
   })
 
   async function getSnapMode(): Promise<void> {
-    const mode = await renderer.engine.interface.read_engine_settings().then(settings => settings.SNAP_MODE)
+    const mode = await renderer.engine.interface.read_engine_settings().then((settings) => settings.SNAP_MODE)
     setSnapMode(mode)
   }
 

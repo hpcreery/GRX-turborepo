@@ -1,33 +1,32 @@
-import { ActionIcon, Affix, Badge, Code, Divider, ScrollArea, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
-import { Card, Text } from "@mantine/core"
-import { useEffect, useState, useContext, type JSX } from "react"
+import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
+import { STANDARD_SYMBOLS, type StandardSymbol } from "@repo/engine/data/shape/symbol/symbol"
+import type { QuerySelection } from "@repo/engine/engine"
+import type { Renderer } from "@repo/engine/index"
 import { PointerEvents } from "@repo/engine/index"
+import { type AttributesType, FeatureTypeIdentifier, SymbolTypeIdentifier } from "@repo/engine/types"
+import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import type { ShapeDistance } from "@repo/engine/view/shape-renderer"
+import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
 import {
+  IconArrowUpBar,
   IconCircle,
   IconLine,
-  IconVectorSpline,
-  IconPolygon,
-  IconShape2,
-  IconQuestionMark,
-  IconX,
-  IconPictureInPicture,
-  IconReplace,
-  IconArrowUpBar,
   IconNorthStar,
+  IconPictureInPicture,
+  IconPolygon,
+  IconQuestionMark,
+  IconReplace,
+  IconShape2,
+  IconVectorSpline,
+  IconX,
 } from "@tabler/icons-react"
-import type { QuerySelection } from "@repo/engine/engine"
-import classes from "./FeatureSidebar.module.css"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-import { baseUnitsConversionFactor } from "@repo/engine/utils"
 import chroma from "chroma-js"
-import { STANDARD_SYMBOLS, type StandardSymbol } from "@repo/engine/data/shape/symbol/symbol"
-import { type AttributesType, FeatureTypeIdentifier, SymbolTypeIdentifier } from "@repo/engine/types"
-import { menuItems } from "@src/contexts/EditorContext"
-import type { Renderer } from "@repo/engine/index"
-import type { ShapeDistance } from "@repo/engine/view/shape-renderer"
 import type { vec3 } from "gl-matrix"
+import { type JSX, useContext, useEffect, useState } from "react"
+import classes from "./FeatureSidebar.module.css"
+import { Contour } from '@repo/engine/data/shape/shape.d'
 
-interface ToolbarProps {}
+type ToolbarProps = {}
 
 function CornerIcon({ children }: { children: JSX.Element }): JSX.Element {
   const [hover, setHover] = useState<boolean>(false)
@@ -70,7 +69,7 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
   }
 
   useEffect(() => {
-    const handler = (e): void => {
+    const handler = (e: Event): void => {
       const featuresTemp = (e as CustomEvent<QuerySelection[]>).detail
       if (featuresTemp.length > 0) {
         setMounted(true)
@@ -414,13 +413,13 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
               Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
             </Text>
             <Text>
-              Islands: <Code>{selection.shape.contours.filter((x) => x.poly_type == 1).length}</Code>
+              Islands: <Code>{selection.shape.contours.filter((x: Contour) => x.poly_type == 1).length}</Code>
             </Text>
             <Text>
-              Holes: <Code>{selection.shape.contours.filter((x) => x.poly_type == 0).length}</Code>
+              Holes: <Code>{selection.shape.contours.filter((x: Contour) => x.poly_type == 0).length}</Code>
             </Text>
             <Text>
-              Edges: <Code>{selection.shape.contours.map((ctr) => ctr.segments.length).reduce((p, c) => p + c, 0)}</Code>
+              Edges: <Code>{selection.shape.contours.map((ctr: Contour) => ctr.segments.length).reduce((p: number, c: number) => p + c, 0)}</Code>
             </Text>
             <Text>
               Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>

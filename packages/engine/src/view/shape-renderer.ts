@@ -14,7 +14,7 @@ import { settings } from "../settings"
 
 const { SYMBOL_PARAMETERS_MAP, STANDARD_SYMBOLS_MAP } = Symbols
 
-interface CommonAttributes {}
+type CommonAttributes = {}
 
 interface CommonUniforms {
   u_Transform: mat3
@@ -34,7 +34,7 @@ interface QueryUniforms {
   u_PointerPosition: vec2
   u_ZOffset: number
 }
-interface QueryAttributes {}
+type QueryAttributes = {}
 
 interface QueryProps {
   pointer: vec2

@@ -1,19 +1,16 @@
-import { useState, useEffect, useContext, JSX } from "react"
-import { Group, Modal, NumberInput, Switch, Space, Button, Stack, Paper, Input } from "@mantine/core"
-import { Binary } from "@repo/engine/types"
-import { TransformOrder } from "@repo/engine/transform"
+import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { Button, Group, Input, Modal, NumberInput, Paper, Space, Stack, Switch } from "@mantine/core"
+import type { TransformOrder } from "@repo/engine/transform"
+import type { Binary } from "@repo/engine/types"
+import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { IconGripHorizontal } from "@tabler/icons-react"
 // import type { LayerInfo } from "@repo/engine/engine"
 import { vec2 } from "gl-matrix"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-
-import { useSortable } from "@dnd-kit/sortable"
-import { CSS } from "@dnd-kit/utilities"
-
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { IconGripHorizontal } from "@tabler/icons-react"
-import { baseUnitsConversionFactor } from "@repo/engine/utils"
-import { restrictToVerticalAxis, restrictToParentElement } from "@dnd-kit/modifiers"
+import { type JSX, useContext, useEffect, useState } from "react"
 
 export interface LayerTransformProps {
   layerID: string

@@ -42,7 +42,7 @@ export default defineConfig({
   },
   plugins: [
     dts(),
-    comlink(),
+    comlink() as any,
     arraybuffer(),
     glslify({
       compress: false,
@@ -54,7 +54,7 @@ export default defineConfig({
     format: "es",
     plugins: () => [
       dts(),
-      comlink(),
+      comlink() as any,
       arraybuffer(),
       glslify({
         compress: false,

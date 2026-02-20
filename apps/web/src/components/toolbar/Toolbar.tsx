@@ -1,41 +1,40 @@
-import React, { JSX } from "react"
+// import chroma from 'chroma-js'
+import { ActionIcon, Card, Group, Kbd, Modal, Popover, Tooltip, useMantineTheme } from "@mantine/core"
+import { useDisclosure, useHotkeys } from "@mantine/hooks"
+import type { PointerSettings } from "@repo/engine/index"
+import { PointerMode } from "@repo/engine/types"
+import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
+import { actions } from "@src/contexts/Spotlight"
 import {
-  IconArrowsMove,
-  IconRulerMeasure,
   // IconZoomIn,
   // IconZoomOut,
   // IconHome,
   IconAdjustments,
-  IconCube3dSphere,
-  // IconCube3dSphereOff,
-  IconCube,
-  // IconGridDots,
-  IconGrid4x4,
-  IconClick,
-  IconZoomReset,
-  IconTrashX,
-  IconEngine,
-  IconPointerPin,
+  IconArrowsMove,
+  IconBadge3d,
   IconBone,
   IconBoneOff,
-  IconBadge3d,
+  IconClick,
+  // IconCube3dSphereOff,
+  IconCube,
+  IconCube3dSphere,
+  IconEngine,
+  // IconGridDots,
+  IconGrid4x4,
+  IconPointerPin,
+  IconRulerMeasure,
+  IconTrashX,
+  IconZoomReset,
 } from "@tabler/icons-react"
-// import chroma from 'chroma-js'
-import { Modal, ActionIcon, Card, Group, Tooltip, useMantineTheme, Kbd, Popover } from "@mantine/core"
-import { useDisclosure, useHotkeys } from "@mantine/hooks"
+import { useContextMenu } from "mantine-contextmenu"
+import React, { type JSX } from "react"
+import ThreeDSettings from "./3DSettings"
+import EngineSettings from "./EngineSettings"
 import GeneralSettings from "./GeneralSettings"
 import GridSettings from "./GridSettings"
-import EngineSettings from "./EngineSettings"
-import type { PointerSettings } from "@repo/engine/index"
-import { useContextMenu } from "mantine-contextmenu"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-import { actions } from "@src/contexts/Spotlight"
-import { menuItems } from "@src/contexts/EditorContext"
-import { PointerMode } from "@repo/engine/types"
 import SnapSettings from "./SnapSettings"
-import ThreeDSettings from './3DSettings'
 
-interface ToolbarProps {}
+type ToolbarProps = {}
 
 export default function Toolbar(_props: ToolbarProps): JSX.Element | null {
   const { units, renderer } = React.useContext(EditorConfigProvider)

@@ -1,7 +1,7 @@
-import React from "react"
-import { ContextMenuItemOptions } from "mantine-contextmenu"
-import { Units } from "@repo/engine/types"
 import { Renderer } from "@repo/engine/index"
+import type { Units } from "@repo/engine/types"
+import type { ContextMenuItemOptions } from "mantine-contextmenu"
+import React from "react"
 
 export interface EditorContext {
   renderer: Renderer

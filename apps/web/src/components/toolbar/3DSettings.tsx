@@ -1,11 +1,11 @@
-import { useEffect, useContext, JSX } from "react"
 import { Kbd, SegmentedControl } from "@mantine/core"
-import { IconBadge3d } from "@tabler/icons-react"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
-import { actions } from "@src/contexts/Spotlight"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { actions } from "@src/contexts/Spotlight"
+import { IconBadge3d } from "@tabler/icons-react"
+import { type JSX, useContext, useEffect } from "react"
 
-interface ThreeDSettingsProps {}
+type ThreeDSettingsProps = {}
 const ViewModes = ["Off", "3D Orthographic", "3D Perspective"] as const
 type ViewMode = (typeof ViewModes)[number]
 

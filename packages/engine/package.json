@@ -6,7 +6,8 @@
     "build": "vite build",
     "build:shaders": "node src/shaders/build.js",
     "build:shaders:watch": "node src/shaders/watch.js",
-    "build:chevrotain:types": "tsx lib/nc/chevrotain-parser/gen_dts_signature.js"
+    "build:chevrotain:types": "tsx lib/nc/chevrotain-parser/gen_dts_signature.js",
+    "typecheck": "tsc --noEmit --watch"
   },
   "exports": {
     "./*": {
@@ -27,7 +28,13 @@
     "glslify": "^7.1.1",
     "regl": "^2.1.1",
     "typescript-event-target": "^1.1.1",
-    "zod": "^4.1.12"
+    "zod": "^4.1.12",
+    "nearley": "^2.20.1",
+    "@tracespace/parser": "^5.0.0-next.0",
+    "@tracespace/plotter": "^5.0.0-alpha.0",
+    "ndarray": "^1.0.19",
+    "webgl-utils": "^1.0.1",
+    "glslify-import": "^3.1.0"
   },
   "peerDependencies": {
     "typescript": "^5"
@@ -35,7 +42,12 @@
   "devDependencies": {
     "ajv": "^8.17.1",
     "rolldown": "1.0.0-rc.4",
-    "unplugin-dts": "1.0.0-beta.6"
+    "unplugin-dts": "1.0.0-beta.6",
+    "vite": "^7.3.1",
+    "vite-plugin-arraybuffer": "^0.1.1",
+    "vite-plugin-comlink": "^5.3.0",
+    "vite-plugin-cross-origin-isolation": "^0.1.6",
+    "vite-plugin-glsl": "^1.5.4"
   },
   "overrides": {
     "esbuild": "0.26.0"

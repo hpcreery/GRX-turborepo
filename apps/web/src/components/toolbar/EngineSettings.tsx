@@ -1,16 +1,12 @@
-import { useEffect, useContext, JSX } from "react"
-import { Text, Flex, Select, Switch, Divider, Kbd } from "@mantine/core"
-import {
-  IconZoom,
-  IconZoomScan,
-  IconHexagonPlus,
-} from "@tabler/icons-react"
-import { ColorBlend } from "@repo/engine/types"
+import { Divider, Flex, Kbd, Select, Switch, Text } from "@mantine/core"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
-import { actions } from "@src/contexts/Spotlight"
+import { ColorBlend } from "@repo/engine/types"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { actions } from "@src/contexts/Spotlight"
+import { IconHexagonPlus, IconZoom, IconZoomScan } from "@tabler/icons-react"
+import { type JSX, useContext, useEffect } from "react"
 
-interface EngineSettingsProps {}
+type EngineSettingsProps = {}
 
 export default function EngineSettings(_props: EngineSettingsProps): JSX.Element | null {
   const { renderer } = useContext(EditorConfigProvider)

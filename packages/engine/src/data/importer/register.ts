@@ -1,4 +1,4 @@
-import { ImportPluginSignature } from '@src/renderer/data/import-plugins';
+import { ImportPluginSignature } from '@src/data/import-plugins';
 import * as Comlink from "comlink"
 
 

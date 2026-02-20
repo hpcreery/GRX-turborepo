@@ -498,7 +498,7 @@ export abstract class Engine {
     down: false,
   }
   public static renderTimeMilliseconds: number = 0
-  private static renderNowInterval: number | null = null
+  private static renderNowInterval: NodeJS.Timeout | null = null
 
   // public loadingFrame: LoadingAnimation
   // public measurements: SimpleMeasurement

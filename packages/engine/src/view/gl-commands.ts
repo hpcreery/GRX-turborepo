@@ -42,11 +42,11 @@ type CustomAttributeConfig = Omit<REGL.AttributeConfig, "buffer"> & {
   buffer: REGL.DynamicVariable<REGL.Buffer>
 }
 
-interface PadUniforms {}
+type PadUniforms = {}
 
-interface LineUniforms {}
+type LineUniforms = {}
 
-interface ArcUniforms {}
+type ArcUniforms = {}
 
 interface DatumTextUniforms {
   u_Texture: REGL.Texture2D
@@ -55,7 +55,7 @@ interface DatumTextUniforms {
   u_CharSpacing: vec2
 }
 
-interface DatumUniforms {}
+type DatumUniforms = {}
 
 interface PadAttributes {
   a_SymNum: CustomAttributeConfig
@@ -168,7 +168,7 @@ interface FrameBufferRenderUniforms {
   u_Polarity: number
   u_RenderTexture: REGL.Framebuffer2D
 }
-interface FrameBufferRendeAttributes {}
+type FrameBufferRendeAttributes = {}
 
 export interface FrameBufferRenderAttachments {
   qtyFeatures: number

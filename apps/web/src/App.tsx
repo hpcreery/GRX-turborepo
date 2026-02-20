@@ -1,20 +1,19 @@
 import "./App.css"
-import { useRef, useEffect, useState, useContext, JSX } from "react"
-import { Renderer } from "@repo/engine/index"
-import chroma from "chroma-js"
-import InfoModal from "./components/InfoModal"
-import Toolbar from "./components/toolbar/Toolbar"
-import MousePosition from "./components/MousePosition"
-import LayerSidebar from "./components/layer-sidebar/LayersSidebar"
 import { Box, Center, Loader, Skeleton, useMantineColorScheme, useMantineTheme } from "@mantine/core"
-import { EditorConfigProvider } from "./contexts/EditorContext"
-import { ThemeConfigProvider } from "./contexts/ThemeContext"
-import { FeatureSidebar } from "./components/feature-sidebar/FeatureSidebar"
-import { useContextMenu } from "mantine-contextmenu"
-import { menuItems } from "./contexts/EditorContext"
 import { useLocalStorage } from "@mantine/hooks"
-import { Units } from "@repo/engine/types"
+import { Renderer } from "@repo/engine/index"
+import type { Units } from "@repo/engine/types"
 import { IconPhotoDown } from "@tabler/icons-react"
+import chroma from "chroma-js"
+import { useContextMenu } from "mantine-contextmenu"
+import { type JSX, useContext, useEffect, useRef, useState } from "react"
+import { FeatureSidebar } from "./components/feature-sidebar/FeatureSidebar"
+import InfoModal from "./components/InfoModal"
+import LayerSidebar from "./components/layer-sidebar/LayersSidebar"
+import MousePosition from "./components/MousePosition"
+import Toolbar from "./components/toolbar/Toolbar"
+import { EditorConfigProvider, menuItems } from "./contexts/EditorContext"
+import { ThemeConfigProvider } from "./contexts/ThemeContext"
 
 const PROJECT_NAME = "main"
 const STEP_NAME = "main"
@@ -105,11 +104,9 @@ export default function App(): JSX.Element | null {
           </Box>
         </EditorConfigProvider.Provider>
       ) : (
-        <>
-          <Center w={"100%"} h={"100%"} mx="auto">
-            <Loader />
-          </Center>
-        </>
+        <Center w={"100%"} h={"100%"} mx="auto">
+          <Loader />
+        </Center>
       )}
       <Skeleton
         visible={renderer == undefined}

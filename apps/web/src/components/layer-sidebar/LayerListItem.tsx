@@ -1,31 +1,30 @@
-import { useState, useEffect, useContext, JSX } from "react"
-import { Button, Popover, ColorPicker, useMantineTheme, Tooltip, useMantineColorScheme, Input } from "@mantine/core"
-import chroma from "chroma-js"
-import { useGesture } from "@use-gesture/react"
-import { animated, SpringValue, useSpring } from "@react-spring/web"
+import { useSortable } from "@dnd-kit/sortable"
+import { CSS } from "@dnd-kit/utilities"
+import { Button, ColorPicker, Input, Popover, Tooltip, useMantineColorScheme, useMantineTheme } from "@mantine/core"
+import { animated, type SpringValue, useSpring } from "@react-spring/web"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import {
-  IconCircleFilled,
+  IconCheck,
   IconCircleDotted,
-  IconTrashX,
-  IconPerspective,
+  IconCircleFilled,
+  IconClearAll,
+  IconColorPicker,
+  IconContrast,
+  IconContrastOff,
+  IconCursorText,
   IconEye,
   IconEyeOff,
-  IconColorPicker,
-  IconContrastOff,
-  IconContrast,
-  IconClearAll,
   IconGripVertical,
-  IconCursorText,
-  IconCheck,
+  IconPerspective,
+  IconTrashX,
 } from "@tabler/icons-react"
-import { ContextMenuContent, ShowContextMenuFunction, useContextMenu } from "mantine-contextmenu"
+import { useGesture } from "@use-gesture/react"
+import type { ReactDOMAttributes } from "@use-gesture/react/dist/declarations/src/types"
+import chroma from "chroma-js"
 import { vec3 } from "gl-matrix"
+import { type ContextMenuContent, type ShowContextMenuFunction, useContextMenu } from "mantine-contextmenu"
+import { type JSX, useContext, useEffect, useState } from "react"
 import LayerTransform from "./transform/LayerTransform"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-
-import { CSS } from "@dnd-kit/utilities"
-import { useSortable } from "@dnd-kit/sortable"
-import { ReactDOMAttributes } from "@use-gesture/react/dist/declarations/src/types"
 
 interface LayerActions {
   download: () => void

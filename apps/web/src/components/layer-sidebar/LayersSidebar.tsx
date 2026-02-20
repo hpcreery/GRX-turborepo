@@ -1,30 +1,27 @@
-import { useEffect, useState, useContext, JSX } from "react"
-import { Card, Group, Text, Button, FileButton, Stack, ScrollArea, Modal, Select, useMantineTheme, Input, Divider } from "@mantine/core"
-import { Dropzone, FileWithPath } from "@mantine/dropzone"
-import { IconFileX, IconFileVector, IconContrast, IconContrastOff, IconClearAll } from "@tabler/icons-react"
-import LayerListItem from "./LayerListItem"
-// import type { LayerInfo } from "@repo/engine/engine"
-import * as Comlink from "comlink"
+import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
+import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
+import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { Button, Card, Divider, FileButton, Group, Input, Modal, ScrollArea, Select, Stack, Text, useMantineTheme } from "@mantine/core"
+import { Dropzone, type FileWithPath } from "@mantine/dropzone"
+import { useLocalStorage } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 
 import { importFormatList, importFormats } from "@repo/engine/data/import-plugins"
+import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { IconClearAll, IconContrast, IconContrastOff, IconFileVector, IconFileX } from "@tabler/icons-react"
+// import type { LayerInfo } from "@repo/engine/engine"
+import * as Comlink from "comlink"
 // import { EngineEvents } from "@repo/engine/engine"
 import { useContextMenu } from "mantine-contextmenu"
-import { EditorConfigProvider } from "@src/contexts/EditorContext"
-
-import { DndContext, closestCenter, KeyboardSensor, PointerSensor, useSensor, useSensors, DragEndEvent } from "@dnd-kit/core"
-import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
-
 import { Resizable } from "re-resizable"
-
-import { useLocalStorage } from "@mantine/hooks"
+import { type JSX, useContext, useEffect, useState } from "react"
+import LayerListItem from "./LayerListItem"
 
 // import { DataInterface } from "@src/renderer"
 
 import type { importFormatName } from "@repo/engine/data/import-plugins"
 
-interface SidebarProps {}
+type SidebarProps = {}
 
 export interface UploadFile extends FileWithPath {
   format: importFormatName
@@ -150,8 +147,8 @@ export default function LayerSidebar(_props: SidebarProps): JSX.Element | null {
       return
     }
     if (active.id !== over.id) {
-      const oldIndex = layers.findIndex((item) => item === active.id)
-      const newIndex = layers.findIndex((item) => item === over.id)
+      const oldIndex = layers.indexOf(active.id as string)
+      const newIndex = layers.indexOf(over.id as string)
       const layerName = layers[oldIndex]
       // temp set the new order
       setLayers((items) => arrayMove(items, oldIndex, newIndex))
@@ -221,22 +218,22 @@ export default function LayerSidebar(_props: SidebarProps): JSX.Element | null {
           // })
         } catch (fileImportError) {
           if (fileImportError instanceof Error) {
-          console.error(fileImportError)
-          // notifications.show({
-          //   title: "Failed to import file",
-          //   message: `${file.name} file import error. ${fileImportError.message}`,
-          //   color: "red",
-          //   autoClose: 5000,
-          // })
-          notifications.update({
-            id: loadingNotificationID,
-            title: "Failed to import file",
-            message: `${file.name} file import error. ${fileImportError.message}`,
-            color: "red",
-            autoClose: 5000,
-            loading: false,
-          })
-        }
+            console.error(fileImportError)
+            // notifications.show({
+            //   title: "Failed to import file",
+            //   message: `${file.name} file import error. ${fileImportError.message}`,
+            //   color: "red",
+            //   autoClose: 5000,
+            // })
+            notifications.update({
+              id: loadingNotificationID,
+              title: "Failed to import file",
+              message: `${file.name} file import error. ${fileImportError.message}`,
+              color: "red",
+              autoClose: 5000,
+              loading: false,
+            })
+          }
         }
       } else {
         notifications.show({

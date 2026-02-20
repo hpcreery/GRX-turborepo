@@ -1,8 +1,8 @@
-import { useEffect, useContext, useState, JSX } from "react"
-import { Table, TableData } from "@mantine/core"
+import { Table, type TableData } from "@mantine/core"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
+import { type JSX, useContext, useEffect, useState } from "react"
 
-interface EngineStatsProps {}
+type EngineStatsProps = {}
 export default function EngineStats(_props: EngineStatsProps): JSX.Element {
   const { renderer } = useContext(EditorConfigProvider)
   const [fps, setFPS] = useState<number>(0)

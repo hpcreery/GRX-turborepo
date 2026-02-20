@@ -1,13 +1,13 @@
-import React, { JSX, useEffect } from "react"
-import { EditorConfigProvider } from "../../contexts/EditorContext"
-import chroma from "chroma-js"
-import { Text, Switch, Divider, Group, Flex, ColorPicker, SegmentedControl, NumberInput, Button, Space } from "@mantine/core"
-import { baseUnitsConversionFactor } from "@repo/engine/utils"
-import { vec4 } from "gl-matrix"
+import { Button, ColorPicker, Divider, Flex, Group, NumberInput, SegmentedControl, Space, Switch, Text } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import { gridSettings } from "@repo/engine/settings"
+import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import chroma from "chroma-js"
+import { vec4 } from "gl-matrix"
+import React, { type JSX, useEffect } from "react"
+import { EditorConfigProvider } from "../../contexts/EditorContext"
 
-interface GridSettingsProps {}
+type GridSettingsProps = {}
 const defaultGridSettings = JSON.parse(JSON.stringify(gridSettings))
 
 export default function GridSettings(_props: GridSettingsProps): JSX.Element | null {
@@ -15,37 +15,37 @@ export default function GridSettings(_props: GridSettingsProps): JSX.Element | n
   const [spacingX, setSpacingX] = useLocalStorage<number>({
     key: "engine:grid:spacing_x",
     // defaultValue: renderer.grid.spacing_x,
-    defaultValue: 0
+    defaultValue: 0,
   })
   const [spacingY, setSpacingY] = useLocalStorage<number>({
     key: "engine:grid:spacing_y",
     // defaultValue: renderer.grid.spacing_y,
-    defaultValue: 0
+    defaultValue: 0,
   })
   const [offsetX, setOffsetX] = useLocalStorage<number>({
     key: "engine:grid:offset_x",
     // defaultValue: renderer.grid.offset_x,
-    defaultValue: 0
+    defaultValue: 0,
   })
   const [offsetY, setOffsetY] = useLocalStorage<number>({
     key: "engine:grid:offset_y",
     // defaultValue: renderer.grid.offset_y,
-    defaultValue: 0
+    defaultValue: 0,
   })
   const [enabled, setEnabled] = useLocalStorage<boolean>({
     key: "engine:grid:enabled",
     // defaultValue: renderer.grid.enabled,
-    defaultValue: false
+    defaultValue: false,
   })
   const [type, setType] = useLocalStorage<"lines" | "dots">({
     key: "engine:grid:type",
     // defaultValue: renderer.grid.type,
-    defaultValue: "lines"
+    defaultValue: "lines",
   })
   const [color, setColor] = useLocalStorage<vec4>({
     key: "engine:grid:color",
     // defaultValue: renderer.grid.color,
-    defaultValue: vec4.fromValues(0.5, 0.5, 0.5, 1)
+    defaultValue: vec4.fromValues(0.5, 0.5, 0.5, 1),
   })
 
   async function getGridSettings(): Promise<void> {

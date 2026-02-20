@@ -1,5 +1,5 @@
 // import * as Comlink from "comlink"
-import { Transform } from "../engine/transform"
+import { Transform } from "@src/transform"
 import { ArtworkBufferCollection, SurfaceBufferCollection } from "./artwork-collections"
 import type * as Shapes from "./shape/shape"
 

@@ -16,7 +16,7 @@ import { DataInterface } from "@src/data/interface"
 import { ArtworkBufferCollection } from "@src/data/artwork-collections"
 // import { Engine } from '../engine'
 
-export interface WorldProps {}
+export type WorldProps = {}
 
 interface WorldUniforms {
   u_Transform: mat3
