@@ -1,6 +1,6 @@
 import { Kbd, SegmentedControl } from "@mantine/core"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
-import { SNAP_MODES, SnapMode } from "@repo/engine/types"
+import { SNAP_MODES, SnapMode } from "@grx/engine/types"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { actions } from "@src/contexts/Spotlight"
 import { IconPointerPin } from "@tabler/icons-react"

@@ -1,5 +1,5 @@
 {
-  "name": "@repo/parser-gdsii",
+  "name": "@grx/parser-gdsii",
   "version": "0.0.0",
   "type": "module",
   "scripts": {
@@ -18,5 +18,8 @@
   },
   "peerDependencies": {
     "typescript": "^5"
+  },
+  "dependencies": {
+    "@grx/typescript-config": "workspace:*"
   }
 }

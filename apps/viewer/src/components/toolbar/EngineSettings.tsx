@@ -1,6 +1,6 @@
 import { Divider, Flex, Kbd, Select, Switch, Text } from "@mantine/core"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
-import { ColorBlend } from "@repo/engine/types"
+import { ColorBlend } from "@grx/engine/types"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { actions } from "@src/contexts/Spotlight"
 import { IconHexagonPlus, IconZoom, IconZoomScan } from "@tabler/icons-react"

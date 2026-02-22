@@ -6,12 +6,12 @@ import { Dropzone, type FileWithPath } from "@mantine/dropzone"
 import { useLocalStorage } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 
-import { importFormatList, importFormats } from "@repo/engine/data/import-plugins"
+import { importFormatList, importFormats } from "@grx/engine/data/import-plugins"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { IconClearAll, IconContrast, IconContrastOff, IconFileVector, IconFileX } from "@tabler/icons-react"
-// import type { LayerInfo } from "@repo/engine/engine"
+// import type { LayerInfo } from "@grx/engine/engine"
 import * as Comlink from "comlink"
-// import { EngineEvents } from "@repo/engine/engine"
+// import { EngineEvents } from "@grx/engine/engine"
 import { useContextMenu } from "mantine-contextmenu"
 import { Resizable } from "re-resizable"
 import { type JSX, useContext, useEffect, useState } from "react"
@@ -19,7 +19,7 @@ import LayerListItem from "./LayerListItem"
 
 // import { DataInterface } from "@src/renderer"
 
-import type { importFormatName } from "@repo/engine/data/import-plugins"
+import type { importFormatName } from "@grx/engine/data/import-plugins"
 
 type SidebarProps = {}
 

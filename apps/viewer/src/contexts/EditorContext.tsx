@@ -1,5 +1,5 @@
-import { Renderer } from "@repo/engine/index"
-import type { Units } from "@repo/engine/types"
+import { Renderer } from "@grx/engine/index"
+import type { Units } from "@grx/engine/types"
 import type { ContextMenuItemOptions } from "mantine-contextmenu"
 import React from "react"
 

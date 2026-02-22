@@ -1,8 +1,8 @@
 // import chroma from 'chroma-js'
 import { ActionIcon, Card, Group, Kbd, Modal, Popover, Tooltip, useMantineTheme } from "@mantine/core"
 import { useDisclosure, useHotkeys } from "@mantine/hooks"
-import type { PointerSettings } from "@repo/engine/index"
-import { PointerMode } from "@repo/engine/types"
+import type { PointerSettings } from "@grx/engine/index"
+import { PointerMode } from "@grx/engine/types"
 import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
 import { actions } from "@src/contexts/Spotlight"
 import {

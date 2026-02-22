@@ -1,6 +1,6 @@
 import { Card, Group, Text, Tooltip } from "@mantine/core"
-import { type PointerEvent, PointerEvents } from "@repo/engine/index"
-import { baseUnitsConversionFactor } from "@repo/engine/utils"
+import { type PointerEvent, PointerEvents } from "@grx/engine/index"
+import { baseUnitsConversionFactor } from "@grx/engine/utils"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import React, { type JSX } from "react"
 

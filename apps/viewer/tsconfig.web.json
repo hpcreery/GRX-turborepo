@@ -1,6 +1,6 @@
 {
   // "extends": "@electron-toolkit/tsconfig/tsconfig.web.json",
-  "extends": "@repo/typescript-config/vite.json",
+  "extends": "@grx/typescript-config/vite.json",
   "compilerOptions": {
     // "lib": ["ESNext", "DOM", "DOM.Iterable"],
     "outDir": "dist/types",
