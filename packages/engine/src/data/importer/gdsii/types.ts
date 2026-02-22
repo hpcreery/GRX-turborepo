@@ -1,20 +1,14 @@
-import type * as Shapes from "@src/data/shape/shape"
-
-export type RecordToken = {
-  recordType: number
-  data: ArrayBuffer | number[] | string
-}
+import type { Shape } from "@src/data/shape/shape"
 
 export type GDSIIHierarchy = {
   [cellName: string]: {
     layer: number
-    // datatype: number
-    shape: Shapes.Shape
+    shape: Shape
   }[]
 }
 
 export type LayerHierarchy = {
   [layer: number]: {
-    shapes: Shapes.Shape[]
+    shapes: Shape[]
   }
 }

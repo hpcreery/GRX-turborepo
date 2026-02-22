@@ -1,12 +1,11 @@
 import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { importFormatList, importFormats } from "@grx/engine/data/import-plugins"
 import { Button, Card, Divider, FileButton, Group, Input, Modal, ScrollArea, Select, Stack, Text, useMantineTheme } from "@mantine/core"
 import { Dropzone, type FileWithPath } from "@mantine/dropzone"
 import { useLocalStorage } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
-
-import { importFormatList, importFormats } from "@grx/engine/data/import-plugins"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { IconClearAll, IconContrast, IconContrastOff, IconFileVector, IconFileX } from "@tabler/icons-react"
 // import type { LayerInfo } from "@grx/engine/engine"

@@ -1,4 +1,3 @@
-import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
 import type { Contour } from "@grx/engine/data/shape/shape.d"
 import { STANDARD_SYMBOLS, type StandardSymbol } from "@grx/engine/data/shape/symbol/symbol"
 import type { QuerySelection } from "@grx/engine/engine"
@@ -7,6 +6,7 @@ import { PointerEvents } from "@grx/engine/index"
 import { type AttributesType, FeatureTypeIdentifier, SymbolTypeIdentifier } from "@grx/engine/types"
 import { baseUnitsConversionFactor } from "@grx/engine/utils"
 import type { ShapeDistance } from "@grx/engine/view/shape-renderer"
+import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
 import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
 import {
   IconArrowUpBar,

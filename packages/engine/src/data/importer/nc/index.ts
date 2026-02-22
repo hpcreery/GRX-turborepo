@@ -1,6 +1,6 @@
 // import * as Comlink from "comlink"
 
-import { retisterPlugin } from "@src/data/importer/register"
+import { registerPlugin } from "@src/data/importer/register"
 import type { DataInterface } from "@src/data/interface"
 import * as z from "zod"
 import { NCLexer, NCToShapesVisitor, parser } from "./parser/parser"
@@ -31,4 +31,4 @@ export async function plugin(buffer: ArrayBuffer, parameters: object, api: typeo
 }
 
 // Comlink.expose(plugin)
-retisterPlugin(plugin)
+registerPlugin(plugin)

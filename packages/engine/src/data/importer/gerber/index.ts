@@ -1,5 +1,5 @@
 import { parse } from "@hpcreery/tracespace-parser"
-import { retisterPlugin } from "@src/data/importer/register"
+import { registerPlugin } from "@src/data/importer/register"
 import type { DataInterface } from "@src/data/interface"
 import * as z from "zod"
 import { plot } from "./plotter/src"
@@ -25,4 +25,4 @@ export async function plugin(buffer: ArrayBuffer, parameters: object, api: typeo
 }
 
 // Comlink.expose(plugin)
-retisterPlugin(plugin)
+registerPlugin(plugin)

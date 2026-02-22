@@ -1,6 +1,6 @@
 // see https://github.com/vagran/dxf-viewer/tree/master/src/parser
 
-import { retisterPlugin as registerPlugin } from "@src/data/importer/register"
+import { registerPlugin } from "@src/data/importer/register"
 import type { DataInterface } from "@src/data/interface"
 import DxfParser from "dxf-parser"
 import * as z from "zod"

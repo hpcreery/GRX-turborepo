@@ -1,4 +1,4 @@
-import type * as TREE from "./gdsii_tree"
+import type * as TREE from "@grx/parser-gdsii/gdsii_tree"
 import messages from "./messages"
 import { Plotter } from "./plotter"
 import type { LayerHierarchy } from "./types"

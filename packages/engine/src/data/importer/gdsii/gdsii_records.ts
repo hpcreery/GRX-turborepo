@@ -1,6 +1,6 @@
-import type * as TREE from "./gdsii_tree"
-import type { ParserState } from "./parser"
-import * as utils from "./utils"
+import type * as TREE from "@grx/parser-gdsii/gdsii_tree"
+import type { ParserState } from "@grx/parser-gdsii/parser"
+import * as utils from "@grx/parser-gdsii/utils"
 
 // GDSII format references:
 // http://boolean.klaasholwerda.nl/interface/bnf/GDSII.html

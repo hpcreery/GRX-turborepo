@@ -1,5 +1,5 @@
 {
-  "name": "GRX-turborepo",
+  "name": "grx-turborepo",
   "private": true,
   "scripts": {
     "prepare": "husky",
