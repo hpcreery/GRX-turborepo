@@ -1,19 +1,19 @@
-import REGL from "regl"
-import { mat3, vec2, vec3, mat4, vec4 } from "gl-matrix"
-import LayerRenderer, { SelectionRenderer } from "./layer"
-import { ReglRenderers, TLoadedReglRenderers } from "./gl-commands"
-import * as Shapes from "@src/data/shape/shape"
-import { type Units, type BoundingBox, SNAP_MODES_MAP, SnapMode, ColorBlend, ViewBox } from "../types"
-import Transform from "../transform"
-import { UID, UpdateEventTarget } from "../utils"
-import { SimpleMeasurement } from "./measurements"
-import { ShapeDistance } from "./shape-renderer"
-import type { RenderSettings } from "../settings"
-import { settings, origin, gridSettings } from "../settings"
-import ShapeTransform from "../transform"
-import { StepLayer, Step } from "@src/data/project"
-import { DataInterface } from "@src/data/interface"
 import { ArtworkBufferCollection } from "@src/data/artwork-collections"
+import { DataInterface } from "@src/data/interface"
+import type { Step, StepLayer } from "@src/data/project"
+import type * as Shapes from "@src/data/shape/shape"
+import { mat3, mat4, vec2, vec3, vec4 } from "gl-matrix"
+import type REGL from "regl"
+import type { RenderSettings } from "../settings"
+import { gridSettings, origin, settings } from "../settings"
+import type Transform from "../transform"
+import ShapeTransform from "../transform"
+import { type BoundingBox, ColorBlend, SNAP_MODES_MAP, SnapMode, type Units, type ViewBox } from "../types"
+import { UID, UpdateEventTarget } from "../utils"
+import { ReglRenderers, type TLoadedReglRenderers } from "./gl-commands"
+import LayerRenderer, { SelectionRenderer } from "./layer"
+import { SimpleMeasurement } from "./measurements"
+import type { ShapeDistance } from "./shape-renderer"
 // import { Engine } from '../engine'
 
 export type WorldProps = {}
@@ -152,7 +152,7 @@ export class ViewRenderer extends UpdateEventTarget {
         }
         mat4.rotateX(this.transform.matrix3D, this.transform.matrix3D, (rotateX * Math.PI) / 180)
         mat4.rotateY(this.transform.matrix3D, this.transform.matrix3D, (rotateY * Math.PI) / 180)
-        mat4.scale(this.transform.matrix3D, this.transform.matrix3D, [width/height, 1, zoom])
+        mat4.scale(this.transform.matrix3D, this.transform.matrix3D, [width / height, 1, zoom])
       } else {
         mat4.identity(this.transform.matrix3D)
       }
@@ -317,8 +317,8 @@ export class ViewRenderer extends UpdateEventTarget {
     if (settings.ENABLE_3D) {
       const rotatedX = Math.abs(this.transform.rotation[0]) % 360
       const rotatedY = Math.abs(this.transform.rotation[1]) % 360
-      if ((rotatedX > 90 && rotatedX < 270)) y = -y
-      if ((rotatedY > 90 && rotatedY < 270))  x = -x
+      if (rotatedX > 90 && rotatedX < 270) y = -y
+      if (rotatedY > 90 && rotatedY < 270) x = -x
     }
 
     this.transform.velocity = [x, y]
@@ -396,8 +396,8 @@ export class ViewRenderer extends UpdateEventTarget {
     const rotatedX = Math.abs(this.transform.rotation[0]) % 360
     const rotatedY = Math.abs(this.transform.rotation[1]) % 360
     if (settings.ENABLE_3D) {
-      if ((rotatedX > 90 && rotatedX < 270)) y = this.viewBox.height - y
-      if ((rotatedY > 90 && rotatedY < 270))  x = this.viewBox.width - x
+      if (rotatedX > 90 && rotatedX < 270) y = this.viewBox.height - y
+      if (rotatedY > 90 && rotatedY < 270) x = this.viewBox.width - x
     }
     const { zoom } = this.transform
     let newZoom = zoom - s / (1000 / zoom / 2)
@@ -768,7 +768,7 @@ export class ViewRenderer extends UpdateEventTarget {
     const pointerWorldCoord = this.getWorldCoordFromScreenCoord(pointer[0], pointer[1], 0)
     if (settings.SNAP_MODE == SnapMode.OFF) return pointerWorldCoord
 
-    let closest: ShapeDistance | undefined = undefined
+    let closest: ShapeDistance | undefined
     this.world((context) => {
       for (const layer of this.layers) {
         if (!layer.visible) continue
@@ -870,7 +870,8 @@ export class ViewRenderer extends UpdateEventTarget {
     }
 
     // validation checks
-    if (isNaN(boundingBox.min[0]) || isNaN(boundingBox.min[1]) || isNaN(boundingBox.max[0]) || isNaN(boundingBox.max[1])) return
+    if (Number.isNaN(boundingBox.min[0]) || Number.isNaN(boundingBox.min[1]) || Number.isNaN(boundingBox.max[0]) || Number.isNaN(boundingBox.max[1]))
+      return
     if (boundingBox.min[0] > boundingBox.max[0] || boundingBox.min[1] > boundingBox.max[1]) return
     if (boundingBox.min[0] === Infinity || boundingBox.min[1] === Infinity || boundingBox.max[0] === -Infinity || boundingBox.max[1] === -Infinity)
       return
@@ -957,7 +958,7 @@ export class ViewRenderer extends UpdateEventTarget {
       })
       const rotatedX = Math.abs(this.transform.rotation[0]) % 360
       const rotatedY = Math.abs(this.transform.rotation[1]) % 360
-      if (settings.ENABLE_3D && ((rotatedX > 90 && rotatedX < 270) != (rotatedY > 90 && rotatedY < 270))) {
+      if (settings.ENABLE_3D && (rotatedX > 90 && rotatedX < 270) != (rotatedY > 90 && rotatedY < 270)) {
         sortedLayers.reverse()
       }
 

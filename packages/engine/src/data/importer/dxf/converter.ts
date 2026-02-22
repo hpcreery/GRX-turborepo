@@ -1,12 +1,10 @@
 // https://images.autodesk.com/adsk/files/autocad_2012_pdf_dxf-reference_enu.pdf
 
-import { vec2, vec3 } from "gl-matrix"
-import { Vector4 } from "./vec"
-
-import * as DxfParser from "dxf-parser"
 import * as Shapes from "@src/data/shape/shape"
-
+import type * as DxfParser from "dxf-parser"
+import { vec2, vec3 } from "gl-matrix"
 import { NURBSCurve } from "./curves/NURBSCurve"
+import { Vector4 } from "./vec"
 
 type Layers = {
   [layerName: string]: {
@@ -55,9 +53,7 @@ function ensureLayer(layers: Layers, layerName: string): void {
 }
 
 // function unsupported(
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 //   attribute: any,
-//   // eslint-disable-next-line @typescript-eslint/no-explicit-any
 //   check: (a: any) => boolean,
 //   message: string
 // ): boolean {
@@ -96,7 +92,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
       xe: arc.center.x + arc.radius * Math.cos(arc.endAngle),
       ye: arc.center.y + arc.radius * Math.sin(arc.endAngle),
       clockwise: cw,
-      units
+      units,
     })
     return shape
   } else if (entity.type === "CIRCLE") {
@@ -108,7 +104,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
       ys: circle.center.y + circle.radius * Math.sin(0),
       xe: circle.center.x + circle.radius * Math.cos(2 * Math.PI),
       ye: circle.center.y + circle.radius * Math.sin(2 * Math.PI),
-      units
+      units,
     })
     return shape
   } else if (entity.type === "LINE") {
@@ -122,7 +118,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
       ys: line.vertices[0].y,
       xe: line.vertices[1].x,
       ye: line.vertices[1].y,
-      units
+      units,
     })
     return shape
   } else if (entity.type === "SPLINE") {
@@ -182,7 +178,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
       xs: lines[0].x,
       ys: lines[0].y,
       polarity: 1,
-      units
+      units,
       // width: width
     }).addLines(lines)
 
@@ -232,7 +228,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
       ys: lines[0].y,
       polarity: 1,
       width: polyline.thickness || 0, // TODO: verify
-      units
+      units,
     }).addLines(lines)
     return shape
   } else if (entity.type === "INSERT") {
@@ -268,7 +264,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
     const shape = new Shapes.StepAndRepeat({
       shapes: referenceBlock.shapes,
       repeats: repeats,
-      units
+      units,
     })
 
     return shape
@@ -305,7 +301,7 @@ function parseEntity(entity: DxfParser.IEntity, blocks: Blocks, units: "inch" | 
       ys: lines[0].y,
       polarity: 1,
       width: lwpolyline.width || 0, // TODO: verify
-      units
+      units,
     }).addLines(lines)
     return shape
   } else if (entity.type === "POINT") {
@@ -382,7 +378,7 @@ export function getUnits(dxf: DxfParser.IDxf): "inch" | "mm" {
   let units: "inch" | "mm" = "inch"
   // check if $INSUNITS exists
   if (dxf.header && Object.keys(dxf.header).includes("$INSUNITS")) {
-    units = dxf.header["$INSUNITS"] === 1 ? "inch" : dxf.header["$INSUNITS"] === 4 ? "mm" : "inch"
+    units = dxf.header.$INSUNITS === 1 ? "inch" : dxf.header.$INSUNITS === 4 ? "mm" : "inch"
   } else {
     console.warn("No $INSUNITS found, defaulting to inches")
   }

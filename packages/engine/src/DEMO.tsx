@@ -1,12 +1,10 @@
-import React, { JSX, useMemo } from "react"
+import React, { type JSX, useMemo } from "react"
 import "../App.css"
-import * as Symbols from "./data/shape/symbol/symbol"
+import { Box, Button, SegmentedControl, Switch } from "@mantine/core"
+import { type PointerEvent, PointerEvents, Renderer } from "."
 import * as Shapes from "./data/shape/shape"
-import { Renderer } from "."
-import { Button, Switch, Box, SegmentedControl } from "@mantine/core"
-import { PointerEvent, PointerEvents } from "."
-import { SNAP_MODES, SNAP_MODES_MAP } from "./types"
-import { POINTER_MODES, POINTER_MODES_MAP } from "./types"
+import * as Symbols from "./data/shape/symbol/symbol"
+import { POINTER_MODES, type POINTER_MODES_MAP, SNAP_MODES, type SNAP_MODES_MAP } from "./types"
 // import * as BufferCollection from './engine/buffer-collection'
 
 // import gdsiiFile from '@lib/gdsii/testdata/various.gds?arraybuffer'
@@ -21,6 +19,7 @@ import sol from "@lib/gerber/testdata/boards/bus-pirate/BusPirate-v3.6a-SSOP.sol
 // import stc from "@lib/gerber/testdata/boards/bus-pirate/BusPirate-v3.6a-SSOP.stc?arraybuffer"
 // import sts from "@lib/gerber/testdata/boards/bus-pirate/BusPirate-v3.6a-SSOP.sts?arraybuffer"
 import nested_aperture_macro from "@lib/gerber/testdata/gerbers/block-apertures/nested.gbr?arraybuffer"
+
 // import multi_polarity_over_existing from '@lib/gerber/testdata/gerbers/step-repeats/multi-polarity-over-existing.gbr?raw'
 // import multi_polarity_over_self from '@lib/gerber/testdata/gerbers/step-repeats/multi-polarity-over-self.gbr?raw'
 // import gtl_in from "@lib/gerber/testdata/boards/clockblock/clockblock-B_Cu.gbr?arraybuffer"
@@ -443,7 +442,7 @@ const SYMBOLS: Symbols.StandardSymbol[] = []
 
 new Array<number>(Symbols.STANDARD_SYMBOLS.length).fill(0).map((_, i) => {
   const sym = new Symbols.StandardSymbol({
-    id: "symbol" + i, // id
+    id: `symbol${i}`, // id
     symbol: i, // symbol
     width: 0.01, // width, square side, diameter
     height: 0.01, // height
@@ -791,7 +790,7 @@ const MACROS_ARRAY: Symbols.Symbol[] = []
 new Array<number>(10).fill(0).map((_, i) => {
   MACROS_ARRAY.push(
     new Symbols.MacroSymbol({
-      id: "macro" + i, // id
+      id: `macro${i}`, // id
       shapes: [
         // PAD_RECORDS_ARRAY[i],
         // PAD_RECORDS_ARRAY[i + 1],
@@ -886,7 +885,7 @@ const FLATTEN_MACROS_ARRAY: Symbols.Symbol[] = []
 new Array<number>(1).fill(0).map((_, i) => {
   FLATTEN_MACROS_ARRAY.push(
     new Symbols.MacroSymbol({
-      id: "macro" + i, // id
+      id: `macro${i}`, // id
       shapes: OVERLAPPING_PADS_ARRAY,
       // flattenening a macro will cause the macro to be drawn as a single shape, rather than as a collection of shapes.
       // negative shapes within the macro will be subtracted from the positive shapes and not have an effect on the rest of the image.
@@ -901,7 +900,7 @@ const UNFLATTEN_MACROS_ARRAY: Symbols.Symbol[] = []
 new Array<number>(1).fill(0).map((_, i) => {
   UNFLATTEN_MACROS_ARRAY.push(
     new Symbols.MacroSymbol({
-      id: "macro" + i, // id
+      id: `macro${i}`, // id
       shapes: OVERLAPPING_PADS_ARRAY,
       // flattenening a macro will cause the macro to be drawn as a single shape, rather than as a collection of shapes.
       // negative shapes within the macro will be subtracted from the positive shapes and not have an effect on the rest of the image.
@@ -916,7 +915,7 @@ const SPOOF_OVERLAPPING_MACROS_ARRAY: Symbols.Symbol[] = []
 new Array<number>(1).fill(0).map((_, i) => {
   SPOOF_OVERLAPPING_MACROS_ARRAY.push(
     new Symbols.MacroSymbol({
-      id: "macro" + i, // id
+      id: `macro${i}`, // id
       shapes: [OVERLAPPING_PADS_ARRAY[0]],
       // flattenening a macro will cause the macro to be drawn as a single shape, rather than as a collection of shapes.
       // negative shapes within the macro will be subtracted from the positive shapes and not have an effect on the rest of the image.
@@ -1255,7 +1254,7 @@ function DemoApp(): JSX.Element {
 
     // DataInterface.update_step_layer_artwork(project, step1, layer_cmp, MAMA_STEP_AND_REPEAT)
     DataInterface.create_layer(project, "surfaces")
-    DataInterface.create_step_layer_artwork(project, step1, 'surfaces', SURFACE_RECORDS_ARRAY)
+    DataInterface.create_step_layer_artwork(project, step1, "surfaces", SURFACE_RECORDS_ARRAY)
     // DataInterface.update_step_layer_artwork(project, step1, layer_cmp, POLYLINE_RECORDS_ARRAY)
 
     render.addManagedView(box2Ref.current, {
@@ -1624,9 +1623,9 @@ function DemoApp(): JSX.Element {
         pos2 = 0,
         pos3 = 0,
         pos4 = 0
-      if (document.getElementById(elmnt.id + "header")) {
+      if (document.getElementById(`${elmnt.id}header`)) {
         // if present, the header is where you move the DIV from:
-        document.getElementById(elmnt.id + "header")!.onmousedown = dragMouseDown
+        document.getElementById(`${elmnt.id}header`)!.onmousedown = dragMouseDown
       } else {
         // otherwise, move the DIV from anywhere inside the DIV:
         elmnt.onmousedown = dragMouseDown
@@ -1650,8 +1649,8 @@ function DemoApp(): JSX.Element {
         pos3 = e.clientX
         pos4 = e.clientY
         // set the element's new position:
-        elmnt.style.top = elmnt.offsetTop - pos2 + "px"
-        elmnt.style.left = elmnt.offsetLeft - pos1 + "px"
+        elmnt.style.top = `${elmnt.offsetTop - pos2}px`
+        elmnt.style.left = `${elmnt.offsetLeft - pos1}px`
       }
 
       function closeDragElement(): void {
@@ -1886,7 +1885,6 @@ function DemoApp(): JSX.Element {
 //     frameCursor %= maxFrames
 //     const avgFPS = totalFPS / numFrames
 //     setAvgFPS(Math.round(avgFPS))
-//     // eslint-disable-next-line @typescript-eslint/no-explicit-any
 //     const memoryUsed = (window.performance as any).memory.usedJSHeapSize / 1048576
 //     setMemory(Math.round(memoryUsed))
 //     requestAnimationFrame(updateFPS)
@@ -1942,6 +1940,7 @@ function REGLStatsWidget(props: { renderer: Renderer }): JSX.Element {
   //   return Math.round(value * multiplier) / multiplier
   // }
 
+  // biome-ignore lint: not used
   const update = async (): Promise<void> => {
     // const precision = 3
     const stats = await props.renderer.engine.getStats()

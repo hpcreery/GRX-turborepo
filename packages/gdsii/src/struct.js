@@ -1,4 +1,3 @@
-/*eslint-env es6*/
 // https://github.com/lyngklip/structjs
 
 const rechk = /^([<>])?(([1-9]\d*)?([xcbB?hHiIfdsp]))*$/

@@ -1,9 +1,8 @@
-import { BoundingBox, SymbolTypeIdentifier, Units } from '@src/types'
-import { MacroSymbol, StandardSymbol, Symbols } from './symbol'
-import { vec2 } from 'gl-matrix'
-import { convertShapeUnits, getBoundingBoxOfShape } from '../utils'
-import { baseUnitsConversionFactor } from '@src/utils'
-
+import { type BoundingBox, SymbolTypeIdentifier, type Units } from "@src/types"
+import { baseUnitsConversionFactor } from "@src/utils"
+import { vec2 } from "gl-matrix"
+import { convertShapeUnits, getBoundingBoxOfShape } from "../utils"
+import type { MacroSymbol, StandardSymbol, Symbols } from "./symbol"
 
 export function getBoundingBoxOfSymbol(symbol: StandardSymbol | MacroSymbol): BoundingBox {
   const min: vec2 = vec2.fromValues(0, 0)

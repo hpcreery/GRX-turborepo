@@ -1,10 +1,10 @@
-import * as Shapes from "./shape/shape"
-import { StepLayer, Layer, Project, PROJECTS, Step } from "./project"
-import { ArtworkBufferCollection } from "./artwork-collections"
-import importFormats from "./import-plugins"
-import type { importFormatName, ImportPluginSignature } from "./import-plugins"
 import * as Comlink from "comlink"
 import { TypedEventTarget } from "typescript-event-target"
+import type { ArtworkBufferCollection } from "./artwork-collections"
+import type { ImportPluginSignature, importFormatName } from "./import-plugins"
+import importFormats from "./import-plugins"
+import { Layer, PROJECTS, Project, Step, StepLayer } from "./project"
+import type * as Shapes from "./shape/shape"
 
 enum ErrorCode {
   UNKNOWN = 1,
@@ -37,14 +37,11 @@ export interface DataEventsMap {
   projects_list_changed: CustomEvent<ProjectListEventDetail>
 }
 
-
-export interface ProjectListEventDetail {
-}
+export type ProjectListEventDetail = {}
 
 export interface MatrixEventDetail {
   project: Project
 }
-
 
 /**
  * DataInterface object provides all the methods to manage projects.
@@ -67,17 +64,25 @@ export abstract class DataInterface {
   static eventTarget = new TypedEventTarget<DataEventsMap>()
 
   static subscribe_to_matrix(project: Project, callback: (event: CustomEvent<MatrixEventDetail>) => void, options?: AddEventListenerOptions): void {
-    this.eventTarget.addEventListener("matrix_changed", (event) => {
-      if (event.detail.project === project) {
-        callback(event)
-      }
-    }, options)
+    DataInterface.eventTarget.addEventListener(
+      "matrix_changed",
+      (event) => {
+        if (event.detail.project === project) {
+          callback(event)
+        }
+      },
+      options,
+    )
   }
 
   static subscribe_to_projects_list(callback: (event: CustomEvent<ProjectListEventDetail>) => void, options?: AddEventListenerOptions): void {
-    this.eventTarget.addEventListener("projects_list_changed", (event) => {
-      callback(event)
-    }, options)
+    DataInterface.eventTarget.addEventListener(
+      "projects_list_changed",
+      (event) => {
+        callback(event)
+      },
+      options,
+    )
   }
 
   /**
@@ -96,10 +101,7 @@ export abstract class DataInterface {
       throw new CommandError(`Project with name ${project_name} already exists`, ErrorCode.INVALID_INPUT)
     }
     PROJECTS.set(project_name, new Project(project_name))
-    this.eventTarget.dispatchTypedEvent(
-      "projects_list_changed",
-      new CustomEvent("projects_list_changed"),
-    )
+    DataInterface.eventTarget.dispatchTypedEvent("projects_list_changed", new CustomEvent("projects_list_changed"))
   }
 
   /**
@@ -144,7 +146,6 @@ export abstract class DataInterface {
     PROJECTS.set(new_name, project)
   }
 
-
   /**
    * MATRIX MANAGEMENT
    * -----------------
@@ -159,7 +160,7 @@ export abstract class DataInterface {
    * the project, or if a layer with the same name already exists.
    */
   static create_layer(project_name: string, layer_name: string): void {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     if (project.matrix.steps.length === 0) {
       throw new CommandError("No steps available. Please add a step before adding layers.", ErrorCode.STEP_NOT_FOUND)
     }
@@ -171,7 +172,7 @@ export abstract class DataInterface {
     project.matrix.steps.forEach((step) => {
       step.layers.push(new StepLayer(step, layer))
     })
-    this.eventTarget.dispatchTypedEvent(
+    DataInterface.eventTarget.dispatchTypedEvent(
       "matrix_changed",
       new CustomEvent("matrix_changed", {
         detail: {
@@ -188,7 +189,7 @@ export abstract class DataInterface {
    * @returns An array of layer names. In JSON format.
    */
   static read_layers_list(project_name: string): string[] {
-    return this.read_layers(project_name).map((layer) => layer.name)
+    return DataInterface.read_layers(project_name).map((layer) => layer.name)
   }
 
   /**
@@ -197,7 +198,7 @@ export abstract class DataInterface {
    * @returns An array of layer objects.
    */
   static read_layers(project_name: string): Layer[] {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     return project.matrix.layers
   }
 
@@ -207,7 +208,7 @@ export abstract class DataInterface {
    * @returns An array of step names. In JSON format.
    */
   static read_steps_list(project_name: string): string[] {
-    return this.read_steps_info(project_name).map((step) => step.name)
+    return DataInterface.read_steps_info(project_name).map((step) => step.name)
   }
 
   /**
@@ -216,7 +217,7 @@ export abstract class DataInterface {
    * @returns An array of step objects.
    */
   static read_steps_info(project_name: string): Step[] {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     return project.matrix.steps
   }
 
@@ -228,7 +229,7 @@ export abstract class DataInterface {
    * @throws CommandError if the project or step is not found.
    */
   static read_step_info(project_name: string, step_name: string): Step {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     const step = project.matrix.steps.find((step) => step.name === step_name)
     if (!step) {
       throw new CommandError(`Step with name ${step_name} does not exist.`, ErrorCode.STEP_NOT_FOUND)
@@ -245,7 +246,7 @@ export abstract class DataInterface {
    * @throws CommandError if the project, step, or layer is not found.
    */
   static read_step_layer_info(project_name: string, step_name: string, layer_name: string): StepLayer {
-    const step = this.read_step_info(project_name, step_name)
+    const step = DataInterface.read_step_info(project_name, step_name)
     const layer = step.layers.find((layer) => layer.layer.name === layer_name)
     if (!layer) {
       throw new CommandError(`Layer with name ${layer_name} does not exist.`, ErrorCode.LAYER_NOT_FOUND)
@@ -262,7 +263,7 @@ export abstract class DataInterface {
    * the project, or if the layer does not exist.
    */
   static delete_layer(project_name: string, layer_name: string): void {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     if (project.matrix.steps.length === 0) {
       throw new CommandError("No steps available. Cannot remove layer.", ErrorCode.STEP_NOT_FOUND)
     }
@@ -279,7 +280,7 @@ export abstract class DataInterface {
     })
     const layerIndex = project.matrix.layers.findIndex((layer) => layer.name === layer_name)
     project.matrix.layers.splice(layerIndex, 1)
-    this.eventTarget.dispatchTypedEvent(
+    DataInterface.eventTarget.dispatchTypedEvent(
       "matrix_changed",
       new CustomEvent("matrix_changed", {
         detail: {
@@ -296,7 +297,7 @@ export abstract class DataInterface {
    * @param new_name New name for the layer.
    */
   static update_layer_name(project_name: string, old_name: string, new_name: string): void {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     if (project.matrix.steps.length === 0) {
       throw new CommandError("No steps available. Cannot rename layer.", ErrorCode.STEP_NOT_FOUND)
     }
@@ -317,7 +318,7 @@ export abstract class DataInterface {
    * @param new_index New index for the layer in the layer stack.
    */
   static update_layer_position(project_name: string, layer_name: string, new_index: number): void {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     const layer = project.matrix.layers.find((layer) => layer.name === layer_name)
     if (layer === undefined) {
       throw new CommandError(`Layer with name ${layer_name} does not exist.`, ErrorCode.LAYER_NOT_FOUND)
@@ -345,7 +346,7 @@ export abstract class DataInterface {
    * name already exists.
    */
   static create_step(project_name: string, step_name: string): void {
-    const project = this._read_project_object(project_name)
+    const project = DataInterface._read_project_object(project_name)
     if (project.matrix.steps.find((step) => step.name === step_name)) {
       throw new CommandError(`Step with name ${step_name} already exists.`, ErrorCode.INVALID_INPUT)
     }
@@ -354,7 +355,7 @@ export abstract class DataInterface {
     project.matrix.layers.forEach((layer) => {
       step.layers.push(new StepLayer(step, layer))
     })
-    this.eventTarget.dispatchTypedEvent(
+    DataInterface.eventTarget.dispatchTypedEvent(
       "matrix_changed",
       new CustomEvent("matrix_changed", {
         detail: {
@@ -371,11 +372,11 @@ export abstract class DataInterface {
    * @returns void
    */
   static delete_step(project_name: string, step_name: string): void {
-    const project = this._read_project_object(project_name)
-    const step = this.read_step_info(project_name, step_name) // to throw error if not found
+    const project = DataInterface._read_project_object(project_name)
+    const step = DataInterface.read_step_info(project_name, step_name) // to throw error if not found
     const index = project.matrix.steps.indexOf(step)
     project.matrix.steps.splice(index, 1)
-    this.eventTarget.dispatchTypedEvent(
+    DataInterface.eventTarget.dispatchTypedEvent(
       "matrix_changed",
       new CustomEvent("matrix_changed", {
         detail: {
@@ -398,7 +399,7 @@ export abstract class DataInterface {
    * @returns A reference to the ArtworkBufferCollection of the specified layer.
    */
   static _read_step_layer_artwork_collection_ref(project_name: string, step_name: string, layer_name: string): ArtworkBufferCollection {
-    const layer = this.read_step_layer_info(project_name, step_name, layer_name)
+    const layer = DataInterface.read_step_layer_info(project_name, step_name, layer_name)
     return layer.artwork
   }
 
@@ -410,10 +411,9 @@ export abstract class DataInterface {
    * @returns - An array of Shapes representing the artwork data.
    */
   static read_step_layer_artwork(project_name: string, step_name: string, layer_name: string): Shapes.Shape[] {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     return artwork.toJSON()
   }
-
 
   /**
    * Adds the artwork data as JSON for the specified layer in the specified step of the specified project.
@@ -424,7 +424,7 @@ export abstract class DataInterface {
    * @returns void
    */
   static update_step_layer_artwork(project_name: string, step_name: string, layer_name: string, artworkData: Shapes.Shape[]): void {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     artwork.fromJSON(artworkData)
   }
 
@@ -437,11 +437,10 @@ export abstract class DataInterface {
    * @returns void
    */
   static create_step_layer_artwork(project_name: string, step_name: string, layer_name: string, artworkData: Shapes.Shape[]): void {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     artwork.clear()
     artwork.fromJSON(artworkData)
   }
-
 
   /**
    * Adds a new feature to the artwork collection for the specified layer in the specified step of the specified project.
@@ -452,7 +451,7 @@ export abstract class DataInterface {
    * @returns The index of the newly added shape in the artwork collection.
    */
   static create_step_layer_shape(project_name: string, step_name: string, layer_name: string, shape: Shapes.Shape): number {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     const return_value = artwork.create(shape)
     return return_value
   }
@@ -466,7 +465,7 @@ export abstract class DataInterface {
    * @returns The shape at the specified index in the artwork collection.
    */
   static read_step_layer_shape(project_name: string, step_name: string, layer_name: string, index: number): Shapes.Shape {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     return artwork.read(index)
   }
 
@@ -480,7 +479,7 @@ export abstract class DataInterface {
    * @returns void
    */
   static update_step_layer_shape(project_name: string, step_name: string, layer_name: string, index: number, shape: Shapes.Shape): void {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     artwork.update(index, shape)
   }
 
@@ -493,7 +492,7 @@ export abstract class DataInterface {
    * @returns void
    */
   static delete_step_layer_shape(project_name: string, step_name: string, layer_name: string, index: number): void {
-    const artwork = this._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
+    const artwork = DataInterface._read_step_layer_artwork_collection_ref(project_name, step_name, layer_name)
     artwork.delete(index)
   }
 
@@ -534,4 +533,3 @@ async function _import_file<Format extends importFormatName>(buffer: ArrayBuffer
     throw new CommandError(`No parser found for format: ${format}.`, ErrorCode.INVALID_INPUT)
   }
 }
-

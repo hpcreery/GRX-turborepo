@@ -41,7 +41,6 @@ export function recordReader(stream: ArrayBuffer): RecordToken[] {
     } else if (dataType === GDSII.DataType.ASCIIString) {
       data = new TextDecoder().decode(word3)
       // remove null characters
-      // eslint-disable-next-line no-control-regex
       data = data.replace(/\u0000/g, "")
     } else {
       messages.warn(`Lexer: Unknown dataType ${dataType}`)

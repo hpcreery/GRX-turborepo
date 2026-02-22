@@ -1,10 +1,9 @@
-import { FeatureTypeIdentifier, ContourSegmentTypeIdentifier, BoundingBox, Units } from "@src/types"
-import * as SymbolUtils from "./symbol/utils"
+import { type BoundingBox, ContourSegmentTypeIdentifier, FeatureTypeIdentifier, type Units } from "@src/types"
+import { baseUnitsConversionFactor } from "@src/utils"
 import { vec2 } from "gl-matrix"
-import { baseUnitsConversionFactor } from '@src/utils'
-import { convertSymbolUnits } from './symbol/utils'
-import { Contour_Arc_Segment, Contour_Line_Segment, Shape } from './shape'
-
+import type { Contour_Arc_Segment, Contour_Line_Segment, Shape } from "./shape"
+import * as SymbolUtils from "./symbol/utils"
+import { convertSymbolUnits } from "./symbol/utils"
 
 /**
  * Convert the units of a shape and its symbols to the specified units.
@@ -216,7 +215,7 @@ export function getBoundingBoxOfShape(record: Shape | Contour_Arc_Segment | Cont
       console.warn("Unknown record type", record)
       break
   }
-  if (isNaN(min[0]) || isNaN(min[1]) || isNaN(max[0]) || isNaN(max[1])) {
+  if (Number.isNaN(min[0]) || Number.isNaN(min[1]) || Number.isNaN(max[0]) || Number.isNaN(max[1])) {
     console.warn("Corrupt Feature Bounding Box", record, min, max)
   }
   return { min, max }

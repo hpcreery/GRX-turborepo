@@ -1,13 +1,13 @@
-import React, { JSX } from "react"
 import { Flex, Textarea } from "@mantine/core"
-import { Shape } from "@src/data/shape/shape"
+import type { Shape } from "@src/data/shape/shape"
+import React, { type JSX } from "react"
 import { parser, SHXLexer, SHXToShapesVisitor } from "./parser"
 
 const drill = `T01`
 
 export default function NCDemo(): JSX.Element {
   const [input, setInput] = React.useState<string>(drill)
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: allow any here in Demo
   const [parsed, setParsed] = React.useState<any>({})
   const [shapes, _setShapes] = React.useState<Shape[]>([])
   const [error, setError] = React.useState<string | undefined>(undefined)

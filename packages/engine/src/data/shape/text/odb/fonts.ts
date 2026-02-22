@@ -23,7 +23,7 @@
 // ECHAR
 //      Ends the definition of a character.
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// biome-ignore lint: unused now, but will be used in future when implementing character parsing
 const characterSet = [
   "!",
   '"',

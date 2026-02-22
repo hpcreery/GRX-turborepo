@@ -1,9 +1,8 @@
-import REGL from "regl"
+import type { Layer, StepLayer } from "@src/data/project"
 import { vec3 } from "gl-matrix"
-
-import { ShapeRenderer, ShapeRendererProps } from "./shape-renderer"
-import { WorldContext } from "./view"
-import { Layer, StepLayer } from '@src/data/project'
+import type REGL from "regl"
+import { ShapeRenderer, type ShapeRendererProps } from "./shape-renderer"
+import type { WorldContext } from "./view"
 // import { settings } from '../settings'
 // import { ColorBlend } from '../types'
 
@@ -14,7 +13,7 @@ export interface LayerProps {
   alpha?: number
 }
 
-export interface LayerRendererProps extends Omit<ShapeRendererProps, 'image'>, LayerProps {}
+export interface LayerRendererProps extends Omit<ShapeRendererProps, "image">, LayerProps {}
 
 interface LayerUniforms {
   u_Color: vec3
@@ -22,7 +21,7 @@ interface LayerUniforms {
   u_ZOffset: number
 }
 
-interface LayerAttributes {}
+type LayerAttributes = {}
 
 export default class LayerRenderer extends ShapeRenderer {
   public visible = true
@@ -41,9 +40,8 @@ export default class LayerRenderer extends ShapeRenderer {
 
   constructor(props: LayerRendererProps) {
     const image = props.dataLayer.artwork
-    super({...props, image})
+    super({ ...props, image })
     this.dataLayer = props.dataLayer
-
 
     if (props.color !== undefined) {
       this.color = props.color
@@ -55,10 +53,9 @@ export default class LayerRenderer extends ShapeRenderer {
       this.visible = props.visible
     }
 
-
     this.framebuffer = this.regl.framebuffer()
 
-    this.layerConfig = this.regl<LayerUniforms, LayerAttributes, Record<string, never>,  WorldContext>({
+    this.layerConfig = this.regl<LayerUniforms, LayerAttributes, Record<string, never>, WorldContext>({
       depth: {
         enable: true,
         mask: true,
@@ -85,12 +82,17 @@ export default class LayerRenderer extends ShapeRenderer {
   private needsRender(context: REGL.DefaultContext & WorldContext): boolean {
     const contextCopy = JSON.parse(JSON.stringify(context))
     const transformCopy = JSON.parse(JSON.stringify(this.transform))
-    delete contextCopy['tick']
-    delete contextCopy['time']
+    delete contextCopy["tick"]
+    delete contextCopy["time"]
     const contextCopyStr = JSON.stringify(contextCopy)
     const transformCopyStr = JSON.stringify(transformCopy)
     const colorCopyStr = JSON.stringify(this.color)
-    if (this.previousContextString == contextCopyStr && !this.artworkChanged && this.previousTransformString == transformCopyStr && this.previousColorString == colorCopyStr) {
+    if (
+      this.previousContextString == contextCopyStr &&
+      !this.artworkChanged &&
+      this.previousTransformString == transformCopyStr &&
+      this.previousColorString == colorCopyStr
+    ) {
       return false
     }
     this.previousContextString = contextCopyStr
@@ -101,7 +103,6 @@ export default class LayerRenderer extends ShapeRenderer {
   }
 
   public render(context: REGL.DefaultContext & WorldContext): void {
-
     if (!this.needsRender(context)) return
 
     this.framebuffer.resize(context.viewportWidth, context.viewportHeight)
@@ -128,7 +129,6 @@ interface SelectionRendererProps extends ShapeRendererProps {
 }
 
 export class SelectionRenderer extends ShapeRenderer {
-
   private selectionConfig: REGL.DrawCommand<REGL.DefaultContext & WorldContext>
 
   public framebuffer: REGL.Framebuffer2D
@@ -171,8 +171,8 @@ export class SelectionRenderer extends ShapeRenderer {
   private needsRender(context: REGL.DefaultContext & WorldContext): boolean {
     const contextCopy = JSON.parse(JSON.stringify(context))
     const transformCopy = JSON.parse(JSON.stringify(this.transform))
-    delete contextCopy['tick']
-    delete contextCopy['time']
+    delete contextCopy["tick"]
+    delete contextCopy["time"]
     const contextCopyStr = JSON.stringify(contextCopy)
     const transformCopyStr = JSON.stringify(transformCopy)
     if (this.previousContextString == contextCopyStr && !this.artworkChanged && this.previousTransformString == transformCopyStr) {

@@ -1,12 +1,18 @@
-import * as Shapes from "./shape/shape"
-import * as ShapesUtils from "./shape/utils"
-import * as Symbols from "./shape/symbol/symbol"
-import { FeatureTypeIdentifiers, FeatureTypeIdentifier, AttributesType, ContourSegmentTypeIdentifier, SymbolTypeIdentifier } from "@src/types"
-import earcut from "earcut"
-import { fontInfo as cozetteFontInfo } from "./shape/text/cozette/font"
-import ShapeTransform, { Transform } from "@src/transform"
+import ShapeTransform, { type Transform } from "@src/transform"
+import {
+  type AttributesType,
+  ContourSegmentTypeIdentifier,
+  FeatureTypeIdentifier,
+  type FeatureTypeIdentifiers,
+  SymbolTypeIdentifier,
+} from "@src/types"
 import { cyrb64, getScaleMat3, UpdateEventTarget } from "@src/utils"
+import earcut from "earcut"
 import { vec3 } from "gl-matrix"
+import * as Shapes from "./shape/shape"
+import * as Symbols from "./shape/symbol/symbol"
+import { fontInfo as cozetteFontInfo } from "./shape/text/cozette/font"
+import * as ShapesUtils from "./shape/utils"
 
 interface BufferCollection<T extends Shapes.Shape> extends UpdateEventTarget {
   create(shape: T): number
@@ -35,33 +41,33 @@ export abstract class SymbolBufferCollection {
    * @throws Error if the buffer overflows
    */
   static create(symbol: Symbols.StandardSymbol): number {
-    let view = new Float32Array(this.buffer)
-    const precision = Math.pow(10, 8) // 8 decimal places
+    let view = new Float32Array(SymbolBufferCollection.buffer)
+    const precision = 10 ** 8 // 8 decimal places
     const symbolKey = Symbols.SYMBOL_PARAMETERS.map((key) => {
       return Math.round(symbol[key] * precision) / precision
     }).join("_")
-    if (this.map.has(symbolKey)) {
-      const existingIndex = this.map.get(symbolKey)!
+    if (SymbolBufferCollection.map.has(symbolKey)) {
+      const existingIndex = SymbolBufferCollection.map.get(symbolKey)!
       symbol.sym_num.value = existingIndex
       return existingIndex
     }
-    this.map.set(symbolKey, this.length)
+    SymbolBufferCollection.map.set(symbolKey, SymbolBufferCollection.length)
     // console.log("Creating new symbol:", symbolKey, "at index", this.length)
-    const index = this.length
+    const index = SymbolBufferCollection.length
     // if the buffer isn't large enough, we need to expand it
     if (view.length < (index + 1) * Symbols.SYMBOL_PARAMETERS.length) {
       // double the size of the buffer and add additional room for the parameters
       const newBufferSize = (view.length * 2 + Symbols.SYMBOL_PARAMETERS.length) * Float32Array.BYTES_PER_ELEMENT
-      this.buffer = this.buffer.transfer(newBufferSize)
-      view = new Float32Array(this.buffer)
+      SymbolBufferCollection.buffer = SymbolBufferCollection.buffer.transfer(newBufferSize)
+      view = new Float32Array(SymbolBufferCollection.buffer)
     }
     view.set(
       Symbols.SYMBOL_PARAMETERS.map((key) => symbol[key]),
       index * Symbols.SYMBOL_PARAMETERS.length,
     )
     symbol.sym_num.value = index
-    this.length += 1
-    this.events.dispatchTypedEvent("update", new Event("update"))
+    SymbolBufferCollection.length += 1
+    SymbolBufferCollection.events.dispatchTypedEvent("update", new Event("update"))
     return index
   }
 
@@ -71,7 +77,7 @@ export abstract class SymbolBufferCollection {
    * @returns
    */
   static read(index: number): Symbols.StandardSymbol {
-    const view = new Float32Array(this.buffer)
+    const view = new Float32Array(SymbolBufferCollection.buffer)
     if (index < 0 || index >= view.length / Symbols.SYMBOL_PARAMETERS.length) {
       throw new Error("Index out of bounds when reading symbol")
     }
@@ -84,9 +90,9 @@ export abstract class SymbolBufferCollection {
   }
 
   static toJSON(): Symbols.TStandardSymbol[] {
-    const view = new Float32Array(this.buffer)
+    const view = new Float32Array(SymbolBufferCollection.buffer)
     const symbols: Symbols.TStandardSymbol[] = []
-    for (let i = 0; i < this.length; i++) {
+    for (let i = 0; i < SymbolBufferCollection.length; i++) {
       const symbol = new Symbols.StandardSymbol({})
       for (let j = 0; j < Symbols.SYMBOL_PARAMETERS.length; j++) {
         symbol[Symbols.SYMBOL_PARAMETERS[j]] = view[i * Symbols.SYMBOL_PARAMETERS.length + j]
@@ -98,7 +104,7 @@ export abstract class SymbolBufferCollection {
   }
 
   static onUpdate(callback: (event: Event) => void): void {
-    this.events.onUpdate(callback)
+    SymbolBufferCollection.events.onUpdate(callback)
   }
 }
 
@@ -576,7 +582,7 @@ export class SurfaceBufferCollection extends UpdateEventTarget implements Buffer
   } {
     const maxTextureSize = 16384 // This is the maximum texture size for most GPUs, could be queried from WebGL if needed
     // const view = new Float32Array(inputBuffer)
-    if (length > Math.pow(maxTextureSize, 2)) {
+    if (length > maxTextureSize ** 2) {
       throw new Error("Cannot fit data into size")
     }
     if (length === 0) {
@@ -634,7 +640,7 @@ export class SurfacesBufferCollection extends UpdateEventTarget implements Buffe
     const surfaceOutlineSymbol = new Symbols.StandardSymbol({
       id: "surface-outline-symbol",
       symbol: Symbols.STANDARD_SYMBOLS_MAP.Round,
-      outer_dia: 0
+      outer_dia: 0,
     })
 
     const { index: i, collection } = mapping
@@ -1438,7 +1444,7 @@ export class ArtworkBufferCollection extends UpdateEventTarget implements Buffer
       this.artworkMap[index].collectionIndex = newCollectionIndex
       return
     }
-    // @ts-ignore // TS is confused, but we know this is safe
+    // @ts-expect-error // TS is confused, but we know this is safe
     collection.update(feature.collectionIndex, shape)
     this.dispatchTypedEvent("update", new Event("update"))
   }
@@ -1510,41 +1516,41 @@ export abstract class MacroArtworkCollection {
     const { shapes, flatten } = symbol
     symbol.sym_num.value = 0
     const id = cyrb64(JSON.stringify([shapes, flatten])).toString() // generate a new unique ID
-    const existing = this.macros.get(id)
+    const existing = MacroArtworkCollection.macros.get(id)
     symbol.id = id
     if (existing) {
       return existing // If a macro with the same ID already exists, return it
     }
     const macro = new MacroArtworkBufferCollection(shapes, flatten)
-    this.macros.set(symbol.id, macro)
-    this.events.dispatchTypedEvent("update", new Event("update"))
+    MacroArtworkCollection.macros.set(symbol.id, macro)
+    MacroArtworkCollection.events.dispatchTypedEvent("update", new Event("update"))
     return macro
   }
 
   static read(id: string): MacroArtworkBufferCollection | undefined {
-    return this.macros.get(id)
+    return MacroArtworkCollection.macros.get(id)
   }
 
   static update(symbol: Symbols.MacroSymbol): void {
     const { id, shapes, flatten } = symbol
-    if (!this.macros.has(id)) {
+    if (!MacroArtworkCollection.macros.has(id)) {
       throw new Error(`No macro found with key: ${id} when updating macro`)
     }
     const macro = new MacroArtworkBufferCollection(shapes, flatten)
-    this.macros.set(id, macro)
-    this.events.dispatchTypedEvent("update", new Event("update"))
+    MacroArtworkCollection.macros.set(id, macro)
+    MacroArtworkCollection.events.dispatchTypedEvent("update", new Event("update"))
   }
 
   static delete(id: string): void {
-    if (!this.macros.has(id)) {
+    if (!MacroArtworkCollection.macros.has(id)) {
       throw new Error(`No macro found with key: ${id} when deleting macro`)
     }
-    this.macros.delete(id)
-    this.events.dispatchTypedEvent("update", new Event("update"))
+    MacroArtworkCollection.macros.delete(id)
+    MacroArtworkCollection.events.dispatchTypedEvent("update", new Event("update"))
   }
 
   static onUpdate(listener: (event: Event) => void): void {
-    this.events.onUpdate(listener)
+    MacroArtworkCollection.events.onUpdate(listener)
   }
 }
 
@@ -1566,8 +1572,8 @@ export const test = (): void => {
 /**
  * break step and repeat is only partially implemented. it will currently only break surface and polyline shapes
  */
-// @ts-ignore not using but will in future
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
+// @ts-expect-error not using but will in future
+// biome-ignore lint: unuesed now, but will be used in future when implementing breaking of nested step and repeats
 function breakStepRepeat(stepRepeat: Shapes.StepAndRepeat, inputTransform: ShapeTransform): Shapes.Shape[] | undefined {
   const newImage: Shapes.Shape[] = []
   for (const repeat of stepRepeat.repeats) {

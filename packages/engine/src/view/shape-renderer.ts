@@ -1,16 +1,16 @@
-import REGL from "regl"
-import { vec2, vec3, mat3 } from "gl-matrix"
-import * as Shapes from "@src/data/shape/shape"
-import * as ShapesUtils from "@src/data/shape/utils"
+import type { ArtworkBufferCollection } from "@src/data/artwork-collections"
+import type * as Shapes from "@src/data/shape/shape"
 import * as Symbols from "@src/data/shape/symbol/symbol"
-import { BoundingBox, FeatureTypeIdentifier, SNAP_MODES_MAP } from "../types"
-import ShapeTransform, { Transform } from "../transform"
-import { ReglRenderers, TLoadedReglRenderers } from "./gl-commands"
-import { MacroShaderCollection, ShapesShaderCollection, SymbolShaderCollection } from "./buffer-collections"
-import { UpdateEventTarget } from "../utils"
-import { WorldContext } from "./view"
-import { ArtworkBufferCollection } from "@src/data/artwork-collections"
+import * as ShapesUtils from "@src/data/shape/utils"
+import { mat3, vec2, type vec3 } from "gl-matrix"
+import type REGL from "regl"
 import { settings } from "../settings"
+import ShapeTransform, { type Transform } from "../transform"
+import { type BoundingBox, FeatureTypeIdentifier, SNAP_MODES_MAP } from "../types"
+import { UpdateEventTarget } from "../utils"
+import { MacroShaderCollection, ShapesShaderCollection, SymbolShaderCollection } from "./buffer-collections"
+import { ReglRenderers, type TLoadedReglRenderers } from "./gl-commands"
+import type { WorldContext } from "./view"
 
 const { SYMBOL_PARAMETERS_MAP, STANDARD_SYMBOLS_MAP } = Symbols
 
@@ -137,8 +137,7 @@ export class ShapeRenderer extends UpdateEventTarget {
       context: {
         transformMatrix: () => this.transform.matrix,
         prevQtyFeaturesRef: (context: REGL.DefaultContext & Partial<ShapeRendererCommonContext>) => context.qtyFeaturesRef ?? 1,
-        qtyFeaturesRef: (context: REGL.DefaultContext & Partial<ShapeRendererCommonContext>) =>
-          this.qtyFeatures * (context.qtyFeaturesRef ?? 1),
+        qtyFeaturesRef: (context: REGL.DefaultContext & Partial<ShapeRendererCommonContext>) => this.qtyFeatures * (context.qtyFeaturesRef ?? 1),
       },
       uniforms: {
         u_ZOffset: (context) => context.zOffset || 0.0,
@@ -321,7 +320,7 @@ export class ShapeRenderer extends UpdateEventTarget {
       //   distance: distData[i],
       //   // shape: this.artwork.read(i / 4),
       // })
-      let distance = distData[i]
+      const distance = distData[i]
       // distance *= this.transform.scale
 
       // const direction = vec2.fromValues(distData[i + 1], distData[i + 2])
@@ -506,7 +505,7 @@ export class ShapeRenderer extends UpdateEventTarget {
 
   private drawPolyLines(_context: REGL.DefaultContext & WorldContext): void {
     if (this.shapeShaderAttachments.shaderAttachment.polylines.lines.length != 0) {
-    this.drawCollections.drawLines(this.shapeShaderAttachments.shaderAttachment.polylines.lines)
+      this.drawCollections.drawLines(this.shapeShaderAttachments.shaderAttachment.polylines.lines)
     }
     if (this.shapeShaderAttachments.shaderAttachment.polylines.pads.length != 0) {
       this.drawCollections.drawPads(this.shapeShaderAttachments.shaderAttachment.polylines.pads)
@@ -562,7 +561,6 @@ export class ShapeRenderer extends UpdateEventTarget {
 interface MacroRendererProps extends Omit<ShapeRendererProps, "transform"> {
   flatten?: boolean
 }
-
 
 // !IDEA render macro to a texture first, then render that texture as a quad. Only re-render the macro texture when the transform changes zoom. Switch back to hard render when macro is larger than viewport.
 // !IDEA optimize render by manually performing culling and disabling render outside viewport
@@ -647,10 +645,7 @@ export class StepAndRepeatRenderer extends ShapeRenderer {
     this.transform.index = index
   }
 
-  public queryDistance(
-    pointer: vec2,
-    context: REGL.DefaultContext & WorldContext & Partial<ShapeRendererCommonContext>,
-  ): ShapeDistance[] {
+  public queryDistance(pointer: vec2, context: REGL.DefaultContext & WorldContext & Partial<ShapeRendererCommonContext>): ShapeDistance[] {
     const features: ShapeDistance[] = []
     this.repeats.forEach((repeat) => {
       Object.assign(this.transform, repeat)

@@ -1,5 +1,15 @@
-import { IPlotRecord, FeatureTypeIdentifier, ContourSegmentTypeIdentifier, SurfaceContourTypeIdentifier, toMap, Binary, IntersectingTypes, AttributesType, Units } from "@src/types"
-import { Transform } from "@src/transform"
+import type { Transform } from "@src/transform"
+import {
+  type AttributesType,
+  type Binary,
+  ContourSegmentTypeIdentifier,
+  FeatureTypeIdentifier,
+  type IntersectingTypes,
+  type IPlotRecord,
+  SurfaceContourTypeIdentifier,
+  toMap,
+  type Units,
+} from "@src/types"
 import * as Symbols from "./symbol/symbol"
 
 export const PAD_RECORD_PARAMETERS = ["index", "x", "y", "sym_num", "resize_factor", "polarity", "rotation", "mirror_x", "mirror_y"] as const
@@ -311,7 +321,7 @@ export class Surface implements TSurface, IPlotRecord {
    */
   public contours: Contour[] = []
 
-  constructor(record: Partial<IntersectingTypes<Surface, TSurface> & { units: Units}>) {
+  constructor(record: Partial<IntersectingTypes<Surface, TSurface> & { units: Units }>) {
     Object.assign(this, record)
   }
 
@@ -617,4 +627,3 @@ export type Shape = Primitive | Surface | PolyLine | StepAndRepeat | Datum
 export type RawPrimative = TPad_Record | TLine_Record | TArc_Record
 export type RawSurface = TSurface
 export type RawShape = RawPrimative | RawSurface
-

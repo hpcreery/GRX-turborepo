@@ -2,7 +2,7 @@ import path, { resolve } from "node:path"
 import { glob } from "glob"
 import glslify from "rollup-plugin-glslify"
 import dts from "unplugin-dts/vite"
-import { defineConfig } from "vite"
+import { defineConfig, type PluginOption } from "vite"
 import arraybuffer from "vite-plugin-arraybuffer"
 import { comlink } from "vite-plugin-comlink"
 import pkg from "./package.json"
@@ -42,25 +42,25 @@ export default defineConfig({
   },
   plugins: [
     dts(),
-    comlink() as any,
+    comlink(),
     arraybuffer(),
     glslify({
       compress: false,
       // @ts-expect-error - glslify options are not typed
       transform: ["glslify-import"],
-    }),
+    }) as PluginOption,
   ],
   worker: {
     format: "es",
     plugins: () => [
       dts(),
-      comlink() as any,
+      comlink(),
       arraybuffer(),
       glslify({
         compress: false,
         // @ts-expect-error - glslify options are not typed
         transform: ["glslify-import"],
-      }),
+      }) as PluginOption,
     ],
   },
 })

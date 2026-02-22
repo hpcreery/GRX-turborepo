@@ -1,5 +1,5 @@
 // import * as Comlink from "comlink"
-import { Transform } from "@src/transform"
+import type { Transform } from "@src/transform"
 import { ArtworkBufferCollection, SurfaceBufferCollection } from "./artwork-collections"
 import type * as Shapes from "./shape/shape"
 
@@ -161,7 +161,6 @@ export class StepLayer {
     }
   }
 }
-
 // export const TEST = {
 // }
 // export abstract class TEST {
@@ -179,7 +178,7 @@ export class StepLayer {
  * When a connection is made into this shared worker, expose `obj`
  * via the connection `port`.
  */
-// @ts-ignore onconnect is a property of SharedWorkerGlobalScope
+// @ts-expect-error onconnect is a property of SharedWorkerGlobalScope
 // onconnect = function (event): void {
 //   console.log("Shared worker connected", event);
 //   const port = event.ports[0];

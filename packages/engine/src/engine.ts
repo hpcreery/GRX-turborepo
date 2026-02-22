@@ -1,16 +1,15 @@
-import REGL from "regl"
-import { mat3, vec2, vec3 } from "gl-matrix"
-import { initializeFontRenderer, initializeRenderers } from "./view/gl-commands"
 import * as Comlink from "comlink"
-import { Transform } from "./transform"
-import { ShapeDistance } from "./view/shape-renderer"
-import { ViewRenderer } from "./view/view"
-import type { RenderSettings, GridSettings, MeasurementSettings } from "./settings"
-import { settings, gridSettings, measurementSettings } from "./settings"
+import type { mat3, vec2, vec3 } from "gl-matrix"
+import REGL from "regl"
 import { DataInterface } from "./data/interface"
+import type { GridSettings, MeasurementSettings, RenderSettings } from "./settings"
+import { gridSettings, measurementSettings, settings } from "./settings"
+import type { Transform } from "./transform"
+import type { ViewBox } from "./types"
 import { initStaticShaderCollections } from "./view/buffer-collections"
-import { ViewBox } from './types'
-
+import { initializeFontRenderer, initializeRenderers } from "./view/gl-commands"
+import type { ShapeDistance } from "./view/shape-renderer"
+import { ViewRenderer } from "./view/view"
 
 export interface RenderTransform {
   zoom: number
@@ -134,7 +133,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param viewId View ID
    */
   public static delete_view(viewId: string): void {
-    const view = this._get_view(viewId)
+    const view = EngineInterface._get_view(viewId)
     view.destroy()
     Engine.views.delete(viewId)
     Engine.render()
@@ -190,7 +189,7 @@ export abstract class EngineInterface extends DataInterface {
     viewBox.width = viewBox.width * dpr
     viewBox.height = viewBox.height * dpr
 
-    const view = this._get_view(viewId)
+    const view = EngineInterface._get_view(viewId)
     view.updateViewBox(viewBox)
   }
 
@@ -200,7 +199,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param viewBox view box (DomRect)
    */
   public static update_view_box(viewId: string, viewBox: ViewBox): void {
-    const view = this._get_view(viewId)
+    const view = EngineInterface._get_view(viewId)
     view.updateViewBox(viewBox)
   }
 
@@ -209,7 +208,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param view Toss View with momentum
    */
   public static view_toss(viewId: string): void {
-    this._get_view(viewId).toss()
+    EngineInterface._get_view(viewId).toss()
   }
 
   /**
@@ -219,17 +218,17 @@ export abstract class EngineInterface extends DataInterface {
    * @param y Y movement in pixels
    */
   public static view_move(viewId: string, x: number, y: number): void {
-    this._get_view(viewId).moveViewport(x, y)
+    EngineInterface._get_view(viewId).moveViewport(x, y)
   }
 
-    /**
+  /**
    * Move view viewport
    * @param viewId View ID
    * @param x X rotation degrees
    * @param y Y rotation degrees
    */
   public static view_rotate(viewId: string, x: number, y: number): void {
-    this._get_view(viewId).rotateViewport(x, y)
+    EngineInterface._get_view(viewId).rotateViewport(x, y)
   }
 
   /**
@@ -237,7 +236,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param viewId View ID
    */
   public static view_pointer_grab(viewId: string): void {
-    this._get_view(viewId).grabViewport()
+    EngineInterface._get_view(viewId).grabViewport()
   }
 
   /**
@@ -245,7 +244,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param viewId View ID
    */
   public static view_pointer_release(viewId: string): void {
-    this._get_view(viewId).releaseViewport()
+    EngineInterface._get_view(viewId).releaseViewport()
   }
 
   /**
@@ -256,7 +255,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param s Scale factor
    */
   public static zoom(viewId: string, x: number, y: number, s: number): void {
-    this._get_view(viewId).zoom(x, y, s)
+    EngineInterface._get_view(viewId).zoom(x, y, s)
   }
 
   /**
@@ -265,7 +264,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Dragging State boolean
    */
   public static read_pointer_grab(viewId: string): boolean {
-    return this._get_view(viewId).isDragging()
+    return EngineInterface._get_view(viewId).isDragging()
   }
 
   /**
@@ -276,7 +275,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param s Scale factor
    */
   public static zoom_at_point(viewId: string, x: number, y: number, s: number): void {
-    this._get_view(viewId).zoomAtPoint(x, y, s)
+    EngineInterface._get_view(viewId).zoomAtPoint(x, y, s)
   }
 
   /**
@@ -287,7 +286,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns World Position [x, y]
    */
   public static read_world_position_from_canvas_position(viewId: string, x: number, y: number, z: number): [number, number] {
-    return this._get_view(viewId).getWorldCoordFromScreenCoord(x, y, z)
+    return EngineInterface._get_view(viewId).getWorldCoordFromScreenCoord(x, y, z)
   }
 
   /**
@@ -296,7 +295,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Render Transform
    */
   public static read_view_transform(viewId: string): Partial<RenderTransform> {
-    return this._get_view(viewId).getTransform()
+    return EngineInterface._get_view(viewId).getTransform()
   }
 
   /**
@@ -305,7 +304,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param transform Render Transform
    */
   public static update_view_transform(viewId: string, transform: Partial<RenderTransform>): void {
-    this._get_view(viewId).updateTransform(transform)
+    EngineInterface._get_view(viewId).updateTransform(transform)
   }
 
   /**
@@ -315,7 +314,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Visibility boolean
    */
   public static read_view_layer_visibility(viewId: string, layer: string): boolean {
-    return this._get_view(viewId).getLayerVisibility(layer)
+    return EngineInterface._get_view(viewId).getLayerVisibility(layer)
   }
 
   /**
@@ -325,7 +324,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param visible Visibility boolean
    */
   public static update_view_layer_visibility(viewId: string, layer: string, visible: boolean): void {
-    this._get_view(viewId).setLayerVisibility(layer, visible)
+    EngineInterface._get_view(viewId).setLayerVisibility(layer, visible)
   }
 
   /**
@@ -335,7 +334,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Color vec3 in gl format
    */
   public static read_view_layer_color(viewId: string, layer: string): vec3 {
-    return this._get_view(viewId).getLayerColor(layer)
+    return EngineInterface._get_view(viewId).getLayerColor(layer)
   }
 
   /**
@@ -345,7 +344,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param color Color vec3 in gl format
    */
   public static update_view_layer_color(viewId: string, layer: string, color: vec3): void {
-    this._get_view(viewId).setLayerColor(layer, color)
+    EngineInterface._get_view(viewId).setLayerColor(layer, color)
   }
 
   /**
@@ -355,7 +354,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Transform
    */
   public static read_view_layer_transform(viewId: string, layer: string): Transform {
-    return this._get_view(viewId).getLayerTransform(layer)
+    return EngineInterface._get_view(viewId).getLayerTransform(layer)
   }
 
   /**
@@ -365,7 +364,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param transform Partial Transform
    */
   public static update_view_layer_transform(viewId: string, layer: string, transform: Partial<Transform>): void {
-    this._get_view(viewId).setLayerTransform(layer, transform)
+    EngineInterface._get_view(viewId).setLayerTransform(layer, transform)
   }
 
   // /**
@@ -385,7 +384,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Array of Query Selections
    */
   public static read_view_select(viewId: string, pointer: vec2): QuerySelection[] {
-    return this._get_view(viewId).select(pointer)
+    return EngineInterface._get_view(viewId).select(pointer)
   }
 
   /**
@@ -395,7 +394,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Snap Point vec2
    */
   public static read_view_snap_point(viewId: string, pointer: vec2): vec2 {
-    return this._get_view(viewId).snap(pointer)
+    return EngineInterface._get_view(viewId).snap(pointer)
   }
 
   /**
@@ -404,7 +403,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param selection Array of Query Selections
    */
   public static delete_view_selection(viewId: string): void {
-    this._get_view(viewId).clearSelection()
+    EngineInterface._get_view(viewId).clearSelection()
   }
 
   /**
@@ -413,7 +412,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param mouse Partial Pointer
    */
   public static update_view_pointer(viewId: string, mouse: Partial<Pointer>): void {
-    this._get_view(viewId).setPointer(mouse)
+    EngineInterface._get_view(viewId).setPointer(mouse)
   }
 
   /**
@@ -421,7 +420,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param viewId View ID
    */
   public static update_view_zoom_fit_artwork(viewId: string): void {
-    this._get_view(viewId).zoomFit()
+    EngineInterface._get_view(viewId).zoomFit()
   }
 
   /**
@@ -430,7 +429,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param point vec2 point to start measurement, in gl/view coordinates
    */
   public static create_view_measurement(viewId: string, point: vec2): void {
-    this._get_view(viewId).addMeasurement(point)
+    EngineInterface._get_view(viewId).addMeasurement(point)
   }
 
   /**
@@ -439,7 +438,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param point vec2 point to set current measurement to, in gl/view coordinates
    */
   public static update_view_measurement(viewId: string, point: vec2): void {
-    this._get_view(viewId).updateMeasurement(point)
+    EngineInterface._get_view(viewId).updateMeasurement(point)
   }
 
   /**
@@ -448,7 +447,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param point vec2 point to finish measurement at, in gl/view coordinates
    */
   public static finish_view_measurement(viewId: string, point: vec2): void {
-    this._get_view(viewId).finishMeasurement(point)
+    EngineInterface._get_view(viewId).finishMeasurement(point)
   }
 
   /**
@@ -457,7 +456,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Array of measurements with point1 and point2 vec2
    */
   public static read_view_measurement(viewId: string): { point1: vec2; point2: vec2 }[] {
-    return this._get_view(viewId).getMeasurements()
+    return EngineInterface._get_view(viewId).getMeasurements()
   }
 
   /**
@@ -466,7 +465,7 @@ export abstract class EngineInterface extends DataInterface {
    * @returns Current measurement with point1 and point2 vec2 or null if no current measurement
    */
   public static read_view_current_measurement(viewId: string): { point1: vec2; point2: vec2 } | null {
-    return this._get_view(viewId).getCurrentMeasurement()
+    return EngineInterface._get_view(viewId).getCurrentMeasurement()
   }
 
   /**
@@ -474,7 +473,7 @@ export abstract class EngineInterface extends DataInterface {
    * @param viewId View ID
    */
   public static clear_view_measurements(viewId: string): void {
-    this._get_view(viewId).clearMeasurements()
+    EngineInterface._get_view(viewId).clearMeasurements()
   }
 }
 
@@ -623,7 +622,6 @@ interface ReglStats extends REGL.Stats {
   maxUniformsCount: number
   maxAttributesCount: number
 }
-
 
 export function logMatrix(matrix: mat3): void {
   console.log(

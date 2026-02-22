@@ -1,9 +1,11 @@
 // see https://github.com/vagran/dxf-viewer/tree/master/src/parser
-import DxfParser from "dxf-parser"
-import * as converter from "./converter"
-import { retisterPlugin as registerPlugin } from '@src/data/importer/register';
+
+import { retisterPlugin as registerPlugin } from "@src/data/importer/register"
 import type { DataInterface } from "@src/data/interface"
+import DxfParser from "dxf-parser"
 import * as z from "zod"
+import * as converter from "./converter"
+
 // import file from './testdata/noentities.dxf?url'
 
 const Parameters = z.object({
@@ -28,7 +30,6 @@ export async function plugin(buffer: ArrayBuffer, parameters: object, api: typeo
   const layerHierarchy = converter.convert(dxf)
 
   for (const [layerName, layer] of Object.entries(layerHierarchy)) {
-
     const layers = api.read_layers_list(params.project)
     let newLayerName = layerName
     if (layers.includes(layerName)) {

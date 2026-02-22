@@ -1,3 +1,4 @@
+// biome-ignore-all lint: this file is an external dependency
 // import * as MathUtils from './MathUtils.js';
 // import { Quaternion } from './Quaternion.js';
 

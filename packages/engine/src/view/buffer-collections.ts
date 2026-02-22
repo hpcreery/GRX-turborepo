@@ -1,10 +1,11 @@
-import REGL from "regl"
+import { type ArtworkBufferCollection, MacroArtworkCollection, SymbolBufferCollection } from "@src/data/artwork-collections"
 import * as Symbols from "@src/data/shape/symbol/symbol"
-import { Binary, FeatureTypeIdentifier } from "../types"
-import { MacroRenderer, StepAndRepeatRenderer } from "./shape-renderer"
 import { vec2 } from "gl-matrix"
-import { ArtworkBufferCollection, SymbolBufferCollection, MacroArtworkCollection } from "@src/data/artwork-collections"
-import {
+import type REGL from "regl"
+import { settings } from "../settings"
+import { type Binary, FeatureTypeIdentifier } from "../types"
+import { UpdateEventTarget } from "../utils"
+import type {
   ArcAttachments,
   DatumAttachments,
   DatumTextAttachments,
@@ -13,9 +14,7 @@ import {
   SurfaceAttachments,
   SurfaceWithHolesAttachments,
 } from "./gl-commands"
-
-import { settings } from "../settings"
-import { UpdateEventTarget } from "../utils"
+import { MacroRenderer, StepAndRepeatRenderer } from "./shape-renderer"
 
 interface TShaderAttachment {
   pads: PadAttachments
@@ -341,17 +340,17 @@ export abstract class SymbolShaderCollection {
   private static updateDelay = settings.MSPFRAME // milliseconds
 
   public static update(): void {
-    if (this.updateTimer) return
-    this.updateTimer = setTimeout(() => {
-      this.updateTimer = null
-      this._update()
-    }, this.updateDelay)
+    if (SymbolShaderCollection.updateTimer) return
+    SymbolShaderCollection.updateTimer = setTimeout(() => {
+      SymbolShaderCollection.updateTimer = null
+      SymbolShaderCollection._update()
+    }, SymbolShaderCollection.updateDelay)
   }
 
   private static _update(): void {
     if (SymbolBufferCollection.length == 0) return
     const data = new Float32Array(SymbolBufferCollection.buffer).slice(0, SYMBOL_PARAMETERS.length * SymbolBufferCollection.length)
-    this.texture({
+    SymbolShaderCollection.texture({
       width: SYMBOL_PARAMETERS.length,
       height: SymbolBufferCollection.length,
       type: "float",
@@ -361,7 +360,7 @@ export abstract class SymbolShaderCollection {
   }
 
   public static destroy(): void {
-    this.texture.destroy()
+    SymbolShaderCollection.texture.destroy()
   }
 }
 
@@ -372,25 +371,25 @@ export abstract class MacroShaderCollection {
   private static updateDelay = settings.MSPFRAME // milliseconds
 
   public static update(): void {
-    if (this.updateTimer) return
-    this.updateTimer = setTimeout(() => {
-      this.updateTimer = null
-      this._update()
-    }, this.updateDelay)
+    if (MacroShaderCollection.updateTimer) return
+    MacroShaderCollection.updateTimer = setTimeout(() => {
+      MacroShaderCollection.updateTimer = null
+      MacroShaderCollection._update()
+    }, MacroShaderCollection.updateDelay)
     return
   }
 
   private static _update(): void {
-    this.macros.forEach((macro) => {
+    MacroShaderCollection.macros.forEach((macro) => {
       macro.destroy()
     })
-    this.macros.clear()
+    MacroShaderCollection.macros.clear()
     MacroArtworkCollection.macros.forEach((artwork, id) => {
       const macroRenderer = new MacroRenderer({
-        regl: this.regl,
+        regl: MacroShaderCollection.regl,
         image: artwork,
       })
-      this.macros.set(id, macroRenderer)
+      MacroShaderCollection.macros.set(id, macroRenderer)
     })
   }
 }

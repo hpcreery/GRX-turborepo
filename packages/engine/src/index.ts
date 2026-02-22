@@ -1,11 +1,11 @@
 import * as Comlink from "comlink"
-import EngineWorker from "./engine?worker"
-import type { QuerySelection, Engine } from "./engine"
-import { PointerMode } from "./types"
+import type { DataInterface } from "./data/interface"
 import cozetteFont from "./data/shape/text/cozette/CozetteVector.ttf?url"
 import { fontInfo as cozetteFontInfo } from "./data/shape/text/cozette/font"
+import type { Engine, QuerySelection } from "./engine"
+import EngineWorker from "./engine?worker"
+import { PointerMode } from "./types"
 import { UID } from "./utils"
-import type { DataInterface } from "./data/interface"
 
 export interface RenderEngineFrontendConfig {
   container?: HTMLElement
@@ -102,13 +102,15 @@ export class Renderer {
 
     this.engineWorker = new EngineWorker()
     this.engine = Comlink.wrap<typeof Engine>(this.engineWorker)
-    this.engine.init(Comlink.transfer(offscreenCanvasGL, [offscreenCanvasGL]), {
-      attributes,
-      container: this.CONTAINER.getBoundingClientRect(),
-      dpr: this.canvasSettings.dpr,
-    }).then(() => {
-      this.resize()
-    })
+    this.engine
+      .init(Comlink.transfer(offscreenCanvasGL, [offscreenCanvasGL]), {
+        attributes,
+        container: this.CONTAINER.getBoundingClientRect(),
+        dpr: this.canvasSettings.dpr,
+      })
+      .then(() => {
+        this.resize()
+      })
     this.interface = this.engine.interface
 
     this.sendFontData()
@@ -164,8 +166,8 @@ export class Renderer {
     canvas.height = height * dpr
 
     // Set CSS display size
-    canvas.style.width = String(width) + "px"
-    canvas.style.height = String(height) + "px"
+    canvas.style.width = `${String(width)}px`
+    canvas.style.height = `${String(height)}px`
     canvas.style.position = "absolute"
     canvas.style.top = "0px"
     canvas.style.left = "0px"
@@ -179,9 +181,8 @@ export class Renderer {
     const { width, height } = this.CONTAINER.getBoundingClientRect()
     const dpr = this.canvasSettings.dpr
 
-
-    this.canvasGL.style.width = String(width) + "px"
-    this.canvasGL.style.height = String(height) + "px"
+    this.canvasGL.style.width = `${String(width)}px`
+    this.canvasGL.style.height = `${String(height)}px`
     // Only update engine bounding box and DPR - engine will resize offscreen canvas
     this.engine.interface.update_engine_bounding_box(this.CONTAINER.getBoundingClientRect(), dpr)
 
@@ -200,10 +201,7 @@ export class Renderer {
       throw new Error("Element must have a 'id' attribute")
     }
     const engine = this.engine
-    const sendPointerEvent = async (
-      mouse: MouseEvent,
-      event_type: (typeof PointerEvents)[keyof typeof PointerEvents],
-    ): Promise<void> => {
+    const sendPointerEvent = async (mouse: MouseEvent, event_type: (typeof PointerEvents)[keyof typeof PointerEvents]): Promise<void> => {
       const [x, y] = await getMouseWorldCoordinates(mouse)
       this.pointer.dispatchEvent(
         new CustomEvent<PointerCoordinates>(event_type, {

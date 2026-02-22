@@ -1,8 +1,8 @@
-import { describe, it, expect } from "vitest"
+import type * as Shapes from "@src/data/shape/shape"
+import { FeatureTypeIdentifier, type FeatureTypeIdentifiers } from "@src/types"
 import DxfParser from "dxf-parser"
+import { describe, expect, it } from "vitest"
 import * as converter from "./converter"
-import * as Shapes from "@src/data/shape/shape"
-import { FeatureTypeIdentifiers, FeatureTypeIdentifier } from "@src/types"
 
 const EPSILON = 0.0001
 

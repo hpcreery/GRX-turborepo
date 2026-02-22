@@ -1,4 +1,4 @@
-import { vec2 } from "gl-matrix"
+import type { vec2 } from "gl-matrix"
 
 export const FeatureTypeIdentifier = {
   PAD: "pad",
@@ -43,7 +43,6 @@ export interface IPlotRecord {
 
 export interface ISymbolRecord {
   type: SymbolDefinitionTypeIdentifiers
-
 }
 
 export type AttributesType = { [key: string]: string | undefined }
@@ -52,7 +51,7 @@ export function toMap<T extends string>(arr: readonly T[]): { [key in T]: number
   return Object.fromEntries(arr.map((key, i) => [key, i])) as { [key in T]: number }
 }
 
-// eslint-disable-next-line
+// biome-ignore lint: allow any here
 export function toValues<T extends string>(map: { [key in T]: any }): T[] {
   return Object.keys(map) as T[]
 }

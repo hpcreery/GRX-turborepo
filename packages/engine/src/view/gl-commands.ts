@@ -1,33 +1,26 @@
-import REGL from "regl"
 import * as Shapes from "@src/data/shape/shape"
-import { Binary } from "../types"
-
-import PadFrag from "./../shaders/src/Pad.frag"
-import PadVert from "./../shaders/src/Pad.vert"
-import LineFrag from "./../shaders/src/Line.frag"
-import LineVert from "./../shaders/src/Line.vert"
+import { type vec2, vec4 } from "gl-matrix"
+import type REGL from "regl"
+import { fontInfo as cozetteFontInfo } from "../data/shape/text/cozette/font"
+import { type GridSettings, type OriginRenderProps, settings } from "../settings"
 import ArcFrag from "./../shaders/src/Arc.frag"
 import ArcVert from "./../shaders/src/Arc.vert"
-import SurfaceFrag from "./../shaders/src/Surface.frag"
-import SurfaceVert from "./../shaders/src/Surface.vert"
-import GlyphtextFrag from "./../shaders/src/GlyphText.frag"
-import GlyphtextVert from "./../shaders/src/GlyphText.vert"
 import DatumFrag from "./../shaders/src/Datum.frag"
 import DatumVert from "./../shaders/src/Datum.vert"
-
-import GridFrag from "./../shaders/src/Grid.frag"
-import OriginFrag from "./../shaders/src/Origin.frag"
 // import LoadingFrag from "./../shaders/src/Loading/Winding.frag"
 import FullScreenQuad from "./../shaders/src/FullScreenQuad.vert"
-
-import { GridSettings, OriginRenderProps } from "../settings"
-
-import { vec2, vec4 } from "gl-matrix"
-
-import { settings } from "../settings"
-
-import { fontInfo as cozetteFontInfo } from "../data/shape/text/cozette/font"
-import { WorldContext } from "./view"
+import GlyphtextFrag from "./../shaders/src/GlyphText.frag"
+import GlyphtextVert from "./../shaders/src/GlyphText.vert"
+import GridFrag from "./../shaders/src/Grid.frag"
+import LineFrag from "./../shaders/src/Line.frag"
+import LineVert from "./../shaders/src/Line.vert"
+import OriginFrag from "./../shaders/src/Origin.frag"
+import PadFrag from "./../shaders/src/Pad.frag"
+import PadVert from "./../shaders/src/Pad.vert"
+import SurfaceFrag from "./../shaders/src/Surface.frag"
+import SurfaceVert from "./../shaders/src/Surface.vert"
+import type { Binary } from "../types"
+import type { WorldContext } from "./view"
 
 const {
   LINE_RECORD_PARAMETERS,
@@ -768,12 +761,12 @@ export function initializeRenderers(regl: REGL.Regl): void {
   })
 
   // this is a good blend mode
-      //   func: {
-      //   srcRGB: "one",
-      //   srcAlpha: "one",
-      //   dstRGB: "one",
-      //   dstAlpha: "one",
-      // },
+  //   func: {
+  //   srcRGB: "one",
+  //   srcAlpha: "one",
+  //   dstRGB: "one",
+  //   dstAlpha: "one",
+  // },
 
   ReglRenderers.contrastBlendFunc = regl({
     blend: {

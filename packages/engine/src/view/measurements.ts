@@ -1,12 +1,12 @@
-import REGL from "regl"
-import { vec2 } from "gl-matrix"
-import { baseUnitsConversionFactor } from "../utils"
-import { RendererProps, ShapeRenderer } from "./shape-renderer"
+import { ArtworkBufferCollection } from "@src/data/artwork-collections"
 import * as Shapes from "@src/data/shape/shape"
-import { WorldContext } from "./view"
 import { measurementSettings } from "@src/settings"
-import { ArtworkBufferCollection } from '@src/data/artwork-collections'
-import { Units } from '../types'
+import type { vec2 } from "gl-matrix"
+import type REGL from "regl"
+import type { Units } from "../types"
+import { baseUnitsConversionFactor } from "../utils"
+import { type RendererProps, ShapeRenderer } from "./shape-renderer"
+import type { WorldContext } from "./view"
 
 export class SimpleMeasurement extends ShapeRenderer {
   public measurements: { point1: vec2; point2: vec2 }[] = []

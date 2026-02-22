@@ -1,9 +1,9 @@
 // import * as Comlink from "comlink"
 
-import { retisterPlugin } from '@src/data/importer/register';
-import { parser, NCLexer, NCToShapesVisitor } from "./parser/parser"
-import type { DataInterface } from "@src/data/interface";
+import { retisterPlugin } from "@src/data/importer/register"
+import type { DataInterface } from "@src/data/interface"
 import * as z from "zod"
+import { NCLexer, NCToShapesVisitor, parser } from "./parser/parser"
 
 const Parameters = z.object({
   step: z.string(),

@@ -52,7 +52,7 @@ function useMessageHandler(): MessageHandler {
     warn,
     error,
     clear,
-    get
+    get,
   }
 }
 

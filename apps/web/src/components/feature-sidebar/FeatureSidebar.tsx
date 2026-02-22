@@ -1,4 +1,5 @@
 import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
+import type { Contour } from "@repo/engine/data/shape/shape.d"
 import { STANDARD_SYMBOLS, type StandardSymbol } from "@repo/engine/data/shape/symbol/symbol"
 import type { QuerySelection } from "@repo/engine/engine"
 import type { Renderer } from "@repo/engine/index"
@@ -24,7 +25,6 @@ import chroma from "chroma-js"
 import type { vec3 } from "gl-matrix"
 import { type JSX, useContext, useEffect, useState } from "react"
 import classes from "./FeatureSidebar.module.css"
-import { Contour } from '@repo/engine/data/shape/shape.d'
 
 type ToolbarProps = {}
 

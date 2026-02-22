@@ -1,7 +1,6 @@
+import type * as Shapes from "@src/data/shape/shape"
 import type { Parent } from "unist"
-
-import * as Shapes from "@src/data/shape/shape"
-import { Units } from './options'
+import type { Units } from "./options"
 
 export type { Polarity } from "@hpcreery/tracespace-parser"
 

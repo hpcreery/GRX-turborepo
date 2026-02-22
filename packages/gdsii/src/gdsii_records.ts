@@ -22,7 +22,7 @@ export type RecordDefinition = {
   name: string
   dataType: DataType
   description: string
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  // biome-ignore lint: allow any here
   parse?: (state: ParserState, data: any) => void
 }
 

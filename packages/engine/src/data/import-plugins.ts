@@ -2,8 +2,7 @@ import dxfPluginWorker from "./importer/dxf?worker"
 import gdsiiPluginWorker from "./importer/gdsii?worker"
 import gerberPluginWorker from "./importer/gerber?worker"
 import ncPluginWorker from "./importer/nc?worker"
-import { DataInterface } from "./interface"
-
+import type { DataInterface } from "./interface"
 
 export type ImportPluginSignature = (buffer: ArrayBuffer, parameters: object, api: typeof DataInterface) => Promise<void>
 
@@ -29,7 +28,5 @@ export const importFormats = {
 export type importFormatName = keyof typeof importFormats
 export const importFormatList = Object.keys(importFormats) as importFormatName[]
 export const defaultImportFormat = importFormatList["RS-274X"]
-
-
 
 export default importFormats

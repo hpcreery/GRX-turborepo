@@ -1,8 +1,9 @@
-import { plot } from "./plotter/src"
 import { parse } from "@hpcreery/tracespace-parser"
-import { retisterPlugin } from '@src/data/importer/register';
+import { retisterPlugin } from "@src/data/importer/register"
 import type { DataInterface } from "@src/data/interface"
 import * as z from "zod"
+import { plot } from "./plotter/src"
+
 // import * as Comlink from "comlink"
 
 const Parameters = z.object({
@@ -21,10 +22,7 @@ export async function plugin(buffer: ArrayBuffer, parameters: object, api: typeo
 
   await api.create_layer(params.project, params.layer)
   await api.update_step_layer_artwork(params.project, params.step, params.layer, image.children)
-
-
 }
 
 // Comlink.expose(plugin)
 retisterPlugin(plugin)
-

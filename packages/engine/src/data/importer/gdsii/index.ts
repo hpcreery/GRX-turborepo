@@ -6,13 +6,13 @@
 // import gdsiiFile from './testdata/GdsIITests_test.gds?url' // broken boundaries, paths with different ends
 // import gdsiiFile from './testdata/GdsIITests_circles.gds?url'
 
-import { recordReader } from "./lexer"
-import { parse } from "./parser"
-import { convert } from "./converter"
+import { retisterPlugin } from "@src/data/importer/register"
 // import messages from "./messages"
 import type { DataInterface } from "@src/data/interface"
 import * as z from "zod"
-import { retisterPlugin } from '@src/data/importer/register';
+import { convert } from "./converter"
+import { recordReader } from "./lexer"
+import { parse } from "./parser"
 
 const Parameters = z.object({
   step: z.string(),

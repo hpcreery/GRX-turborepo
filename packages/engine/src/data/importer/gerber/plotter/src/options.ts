@@ -1,5 +1,5 @@
-import type { GerberTree, Format, ZeroSuppression } from "@hpcreery/tracespace-parser"
-import { UNITS, COORDINATE_FORMAT, GRAPHIC, COMMENT, LEADING, TRAILING } from "@hpcreery/tracespace-parser"
+import type { Format, GerberTree, ZeroSuppression } from "@hpcreery/tracespace-parser"
+import { COMMENT, COORDINATE_FORMAT, GRAPHIC, LEADING, TRAILING, UNITS } from "@hpcreery/tracespace-parser"
 
 export type Units = "mm" | "inch"
 export interface PlotOptions {
@@ -72,7 +72,7 @@ export function getPlotOptions(tree: GerberTree): PlotOptions {
   }
 
   return {
-    units: units ?? 'inch',
+    units: units ?? "inch",
     coordinateFormat: coordinateFormat ?? [2, 4],
     zeroSuppression: zeroSuppression ?? LEADING,
   }

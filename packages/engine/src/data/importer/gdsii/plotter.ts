@@ -1,8 +1,8 @@
-import { vec2 } from "gl-matrix"
-import * as TREE from "./gdsii_tree"
 import * as Shapes from "@src/data/shape/shape"
-import { GDSIIHierarchy } from "./types"
+import { vec2 } from "gl-matrix"
+import type * as TREE from "./gdsii_tree"
 import messages from "./messages"
+import type { GDSIIHierarchy } from "./types"
 
 export class Plotter {
   scale: number

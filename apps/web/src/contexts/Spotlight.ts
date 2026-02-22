@@ -1,7 +1,8 @@
-import { createSpotlight, SpotlightState, type SpotlightActionData } from "@mantine/spotlight"
-import type { MantineStore } from '@mantine/store';
+import { createSpotlight, type SpotlightActionData, type SpotlightState } from "@mantine/spotlight"
+import type { MantineStore } from "@mantine/store"
 
-export const [spotlightStore, spotlight]: readonly [MantineStore<SpotlightState>, { open: () => void; close: () => void; toggle: () => void; }] = createSpotlight()
+export const [spotlightStore, spotlight]: readonly [MantineStore<SpotlightState>, { open: () => void; close: () => void; toggle: () => void }] =
+  createSpotlight()
 
 export const actionsBase: SpotlightActionData[] = []
 

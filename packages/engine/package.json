@@ -24,23 +24,24 @@
     "dxf-parser": "^1.1.2",
     "earcut": "^3.0.2",
     "gl-matrix": "^3.4.4",
-    "glob": "^11.0.3",
-    "glslify": "^7.1.1",
     "regl": "^2.1.1",
     "typescript-event-target": "^1.1.1",
     "zod": "^4.1.12",
-    "nearley": "^2.20.1",
     "@tracespace/parser": "^5.0.0-next.0",
     "@tracespace/plotter": "^5.0.0-alpha.0",
+    "@hpcreery/tracespace-parser": "^5.0.4",
+    "@hpcreery/tracespace-plotter": "^5.0.3",
+    "@hpcreery/tracespace-renderer": "^5.0.3",
     "ndarray": "^1.0.19",
-    "webgl-utils": "^1.0.1",
-    "glslify-import": "^3.1.0"
+    "webgl-utils": "^1.0.1"
   },
   "peerDependencies": {
     "typescript": "^5"
   },
   "devDependencies": {
-    "ajv": "^8.17.1",
+    "glslify-import": "^3.1.0",
+    "glslify": "^7.1.1",
+    "glob": "^11.0.3",
     "rolldown": "1.0.0-rc.4",
     "unplugin-dts": "1.0.0-beta.6",
     "vite": "^7.3.1",
