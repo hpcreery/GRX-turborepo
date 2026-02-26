@@ -1,0 +1,26 @@
+{
+  "name": "@grx/parser-gdsii",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "dev": "tsc --watch",
+    "build": "tsc",
+    "typecheck": "tsc --noEmit --watch"
+  },
+  "files": [
+    "dist/**",
+    "dist"
+  ],
+  "exports": {
+    "./*": {
+      "types": "./src/*.ts",
+      "default": "./dist/*.js"
+    }
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "dependencies": {
+    "@grx/typescript-config": "workspace:*"
+  }
+}

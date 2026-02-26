@@ -1,0 +1,61 @@
+{
+  "name": "@grx/engine",
+  "version": "0.0.0",
+  "type": "module",
+  "scripts": {
+    "build": "vite build",
+    "build:shaders": "node src/shaders/build.js",
+    "build:shaders:watch": "node src/shaders/watch.js",
+    "build:chevrotain:types": "tsx lib/nc/chevrotain-parser/gen_dts_signature.js",
+    "typecheck": "tsc --noEmit --watch"
+  },
+  "exports": {
+    "./*": {
+      "types": "./dist/*.ts",
+      "default": "./dist/*.js"
+    },
+    "./step/layer/shape/text/cozette/CozetteVector.ttf": "./src/step/layer/shape/text/cozette/CozetteVector.ttf"
+  },
+  "sideEffects": [
+    "./src/data/importer/**/*.ts"
+  ],
+  "dependencies": {
+    "@types/unist": "^3.0.3",
+    "chevrotain": "^11.0.3",
+    "chokidar": "^4.0.3",
+    "comlink": "^4.4.2",
+    "dxf-parser": "^1.1.2",
+    "earcut": "^3.0.2",
+    "gl-matrix": "^3.4.4",
+    "regl": "^2.1.1",
+    "typescript-event-target": "^1.1.1",
+    "zod": "^4.1.12",
+    "@tracespace/parser": "^5.0.0-next.0",
+    "@tracespace/plotter": "^5.0.0-alpha.0",
+    "@hpcreery/tracespace-parser": "^5.0.4",
+    "@hpcreery/tracespace-plotter": "^5.0.3",
+    "@hpcreery/tracespace-renderer": "^5.0.3",
+    "ndarray": "^1.0.19",
+    "webgl-utils": "^1.0.1",
+    "@grx/parser-gdsii": "workspace:*"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "devDependencies": {
+    "glslify-import": "^3.1.0",
+    "glslify": "^7.1.1",
+    "glob": "^11.0.3",
+    "rolldown": "1.0.0-rc.4",
+    "unplugin-dts": "1.0.0-beta.6",
+    "vite": "^7.3.1",
+    "vite-plugin-arraybuffer": "^0.1.1",
+    "vite-plugin-comlink": "^5.3.0",
+    "vite-plugin-cross-origin-isolation": "^0.1.6",
+    "vite-plugin-glsl": "^1.5.4",
+    "@grx/typescript-config": "workspace:*"
+  },
+  "overrides": {
+    "esbuild": "0.26.0"
+  }
+}

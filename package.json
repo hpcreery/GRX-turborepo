@@ -1,20 +1,36 @@
 {
-  "name": "GRX-turborepo",
+  "name": "grx-turborepo",
   "private": true,
   "scripts": {
+    "prepare": "husky",
+    "dev": "turbo run dev",
+    "dev:desktop": "turbo run dev:desktop",
     "build": "turbo run build",
-    "dev": "turbo run dev"
+    "build:desktop": "turbo run build:desktop",
+    "lint": "biome lint --write",
+    "format": "biome format --write",
+    "check": "biome check --write",
+    "typecheck": "turbo run typecheck"
   },
   "devDependencies": {
-    "prettier": "^3.6.2",
-    "turbo": "^2.5.6",
-    "typescript": "5.9.2",
-    "@biomejs/biome": "^2.2.4"
+    "@biomejs/biome": "^2.4.0",
+    "@changesets/cli": "^2.29.8",
+    "husky": "^9.1.7",
+    "turbo": "^2.8.3",
+    "typescript": "5.9.3"
   },
   "engines": {
     "node": ">=18"
   },
-  "packageManager": "bun@1.2.17",
+  "packageManager": "pnpm@10.20.0",
+  "pnpm": {
+    "overrides": {
+      "esbuild": "0.26.0"
+    },
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
+  },
   "workspaces": [
     "apps/*",
     "packages/*"
