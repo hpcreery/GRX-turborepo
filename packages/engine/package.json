@@ -16,6 +16,9 @@
     },
     "./step/layer/shape/text/cozette/CozetteVector.ttf": "./src/step/layer/shape/text/cozette/CozetteVector.ttf"
   },
+  "sideEffects": [
+    "./src/data/importer/**/*.ts"
+  ],
   "dependencies": {
     "@types/unist": "^3.0.3",
     "chevrotain": "^11.0.3",

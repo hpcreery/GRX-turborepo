@@ -1,7 +1,7 @@
-import dxfPluginWorker from "./importer/dxf?worker"
-import gdsiiPluginWorker from "./importer/gdsii?worker"
-import gerberPluginWorker from "./importer/gerber?worker"
-import ncPluginWorker from "./importer/nc?worker"
+import dxfPluginWorker from "./importer/dxf?worker&inline"
+import gdsiiPluginWorker from "./importer/gdsii?worker&inline"
+import gerberPluginWorker from "./importer/gerber?worker&inline"
+import ncPluginWorker from "./importer/nc?worker&inline"
 import type { DataInterface } from "./interface"
 
 export type ImportPluginSignature = (buffer: ArrayBuffer, parameters: object, api: typeof DataInterface) => Promise<void>

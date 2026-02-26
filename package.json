@@ -4,7 +4,9 @@
   "scripts": {
     "prepare": "husky",
     "dev": "turbo run dev",
+    "dev:desktop": "turbo run dev:desktop",
     "build": "turbo run build",
+    "build:desktop": "turbo run build:desktop",
     "lint": "biome lint --write",
     "format": "biome format --write",
     "check": "biome check --write",
@@ -24,7 +26,10 @@
   "pnpm": {
     "overrides": {
       "esbuild": "0.26.0"
-    }
+    },
+    "onlyBuiltDependencies": [
+      "electron"
+    ]
   },
   "workspaces": [
     "apps/*",
