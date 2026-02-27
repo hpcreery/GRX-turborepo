@@ -15,12 +15,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
       - name: Install Dependencies
-        run: npm install
-      # - name: Build
-      # run: npm run build:all
+        run: pnpm install
       - name: Build Desktop
-        run: npm run build:desktop
+        run: pnpm run build:desktop
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
@@ -44,10 +46,14 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: latest
+      - uses: pnpm/action-setup@v4
+        name: Install pnpm
+        with:
+          version: 10
       - name: Install Dependencies
-        run: npm install
+        run: pnpm install
       - name: Build
-        run: npm run build
+        run: pnpm run build
       - name: Setup Pages
         uses: actions/configure-pages@v4
       - name: Upload Pages Artifact
