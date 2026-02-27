@@ -1,0 +1,59 @@
+name: Build and Publish
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+jobs:
+  executables:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+      - name: Install Dependencies
+        run: npm ci
+      # - name: Build
+      # run: npm run build:all
+      - name: Build Desktop
+        run: npm run build:desktop
+      - name: Create Release
+        uses: softprops/action-gh-release@v1
+        with:
+          generate_release_notes: true
+          files: |
+            apps/viewer/dist-desktop/*.dmg
+            apps/viewer/dist-desktop/*.exe
+            apps/viewer/dist-desktop/*.AppImage
+            apps/viewer/dist-desktop/*.snap
+            apps/viewer/dist-desktop/*.deb
+  web-page:
+    runs-on: macos-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: latest
+      - name: Install Dependencies
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Setup Pages
+        uses: actions/configure-pages@v4
+      - name: Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: "./apps/viewer/dist/"
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
