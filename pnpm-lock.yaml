@@ -104,6 +104,9 @@ importers:
       re-resizable:
         specifier: ^6.10.1
         version: 6.11.2(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      react:
+        specifier: ^19.2.0
+        version: 19.2.4
       typescript-event-target:
         specifier: ^1.1.1
         version: 1.1.2
@@ -183,9 +186,6 @@ importers:
       npm-check-updates:
         specifier: ^19.1.1
         version: 19.3.2
-      react:
-        specifier: ^19.2.0
-        version: 19.2.4
       react-dom:
         specifier: ^19.2.0
         version: 19.2.4(react@19.2.4)
@@ -258,6 +258,9 @@ importers:
       typescript-event-target:
         specifier: ^1.1.1
         version: 1.1.2
+      vitest:
+        specifier: ^3.2.4
+        version: 3.2.4(@types/debug@4.1.12)(@types/node@25.2.3)(jiti@2.6.1)(tsx@4.21.0)
       webgl-utils:
         specifier: ^1.0.1
         version: 1.0.1
