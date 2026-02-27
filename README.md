@@ -15,7 +15,7 @@
 ![preview](/resources/screenshot-v3.1-dark.png)
 
 <div align="center">
- <h2><a href="https://grx.electronicloud.app/">🔗 Put it to the test!</a></h2>
+ <h2><a href="https://grx.electronicloud.app/">🔗 grx.electronicloud.app</a></h2>
 </div>
 
 ## About
@@ -65,19 +65,60 @@ Contributions are very welcome! Please open an issue or submit a pull request if
 
 ## Development
 
+Prerequisites:
+- [Node.js](https://nodejs.org/) (version 23 or higher)
+- [pnpm](https://pnpm.io/) (version 10 or higher)
+
+Setup the project:
+
 ```bash
 # Install dependencies
 pnpm install
-# Prepare
+
+# Prepare the project (build packages, etc.)
 pnpm prepare
 ```
 
-Use Turborepo to run commands in the monorepo:
+Develop with Web Server:
 
 ```bash
 # Run the development server
 pnpm run dev
+```
 
+Develop with Desktop App (Electron):
+
+```bash
+# Run the development server
+pnpm run dev:desktop
+```
+
+Perform Tests:
+
+```bash
+# Run tests
+pnpm run test
+```
+
+Check (Lint/Format) and Typecheck:
+
+```bash
+# Run lint and format
+pnpm run check
+# Run typecheck
+pnpm run typecheck
+```
+
+Build the Web App:
+
+```bash
 # Build the project
 pnpm run build
+```
+
+Build the Desktop App:
+
+```bash
+# Build the desktop app
+pnpm run build:desktop
 ```

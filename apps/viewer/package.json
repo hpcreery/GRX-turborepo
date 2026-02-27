@@ -7,8 +7,6 @@
   "homepage": "https://grx.electronicloud.app",
   "type": "module",
   "scripts": {
-    "lint": "biome check --write .",
-    "format": "biome format --write .",
     "typecheck": "tsc --noEmit -p tsconfig.web.json --composite false --watch",
     "start": "vite preview",
     "test": "vitest",

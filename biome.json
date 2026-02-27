@@ -11,6 +11,7 @@
       "**",
       "!!**/out",
       "!!**/dist",
+      "!!**/dist-desktop",
       "!!**/pnpm-lock.yaml",
       "!!**/LICENSE.md",
       "!!**/tsconfig.json",

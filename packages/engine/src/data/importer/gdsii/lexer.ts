@@ -1,7 +1,7 @@
+import struct from "@grx/parser-gdsii/struct"
 import type { RecordToken } from "@grx/parser-gdsii/types"
 import * as GDSII from "./gdsii_records"
 import messages from "./messages"
-import struct from "@grx/parser-gdsii/struct"
 // LEXER
 
 // Generator for complete records from a GDSII stream file.

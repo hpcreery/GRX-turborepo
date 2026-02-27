@@ -22,6 +22,7 @@
     "start": {},
     "lint": {},
     "format": {},
+    "check": {},
     "typecheck": {
       "outputs": []
     }
