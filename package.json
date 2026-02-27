@@ -1,5 +1,6 @@
 {
   "name": "grx-turborepo",
+  "version": "0.0.0",
   "private": true,
   "scripts": {
     "prepare": "husky",
