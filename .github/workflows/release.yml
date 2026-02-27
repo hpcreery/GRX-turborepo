@@ -17,8 +17,6 @@ jobs:
           node-version: latest
       - uses: pnpm/action-setup@v4
         name: Install pnpm
-        with:
-          version: 10
       - name: Install Dependencies
         run: pnpm install
       - name: Build Desktop
@@ -48,8 +46,6 @@ jobs:
           node-version: latest
       - uses: pnpm/action-setup@v4
         name: Install pnpm
-        with:
-          version: 10
       - name: Install Dependencies
         run: pnpm install
       - name: Build
