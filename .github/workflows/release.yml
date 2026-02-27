@@ -16,7 +16,7 @@ jobs:
         with:
           node-version: latest
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
       # - name: Build
       # run: npm run build:all
       - name: Build Desktop
@@ -45,7 +45,7 @@ jobs:
         with:
           node-version: latest
       - name: Install Dependencies
-        run: npm ci
+        run: npm install
       - name: Build
         run: npm run build
       - name: Setup Pages
