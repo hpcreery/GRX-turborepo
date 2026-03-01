@@ -1,5 +1,8 @@
 appId: com.grx.app
 productName: GRX
+# override the productName in the app's package.json to avoid issues with electron-builder
+extraMetadata:
+  name: GRX
 directories:
   app: .
   buildResources: resources/icons
