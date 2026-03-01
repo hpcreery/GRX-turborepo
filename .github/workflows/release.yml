@@ -27,7 +27,7 @@ jobs:
 
   executables:
     needs: changelog
-    runs-on: macos-latest
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -55,6 +55,7 @@ jobs:
             apps/viewer/dist-desktop/*.AppImage
             apps/viewer/dist-desktop/*.snap
             apps/viewer/dist-desktop/*.deb
+            apps/viewer/dist-desktop/*.zip
   web-page:
     runs-on: macos-latest
     permissions:
