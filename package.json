@@ -12,7 +12,7 @@
     "format": "biome format --write",
     "check": "biome check --write",
     "typecheck": "turbo run typecheck",
-    "changeset": "changeset"
+    "changelog": "git-cliff --config cliff.toml --latest"
   },
   "devDependencies": {
     "@biomejs/biome": "^2.4.0",
