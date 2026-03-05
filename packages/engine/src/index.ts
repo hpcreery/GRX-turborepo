@@ -7,6 +7,14 @@ import EngineWorker from "./engine?worker"
 import { PointerMode } from "./types"
 import { UID } from "./utils"
 
+export * as data from "./data"
+export * as types from "./types"
+export * as settings from "./settings"
+export * as constants from "./constants"
+export * as utils from "./utils"
+export * as transform from "./transform"
+export * as engine from "./engine"
+
 export interface RenderEngineFrontendConfig {
   container?: HTMLElement
   attributes?: WebGLContextAttributes | undefined
@@ -54,7 +62,7 @@ export class Renderer {
             }
           })
         }
-        target[name] = value
+        Reflect.set(target, name, value)
         return true
       },
     },
@@ -70,7 +78,7 @@ export class Renderer {
     },
     {
       set: (target, name, value): boolean => {
-        target[name] = value
+        Reflect.set(target, name, value)
         if (name === "hidpi") {
           this.resize()
         }

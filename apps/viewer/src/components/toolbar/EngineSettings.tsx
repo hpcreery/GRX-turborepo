@@ -1,4 +1,4 @@
-import { ColorBlend } from "@grx/engine/types"
+import { types } from "@grx/engine"
 import { Divider, Flex, Kbd, Select, Switch, Text } from "@mantine/core"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
@@ -10,7 +10,7 @@ type EngineSettingsProps = {}
 
 export default function EngineSettings(_props: EngineSettingsProps): JSX.Element | null {
   const { renderer } = useContext(EditorConfigProvider)
-  const [colorBlend, setColorBlend] = useLocalStorage<ColorBlend>({
+  const [colorBlend, setColorBlend] = useLocalStorage<types.ColorBlend>({
     key: "engine:COLOR_BLEND",
     defaultValue: "Contrast",
   })
@@ -90,7 +90,7 @@ export default function EngineSettings(_props: EngineSettingsProps): JSX.Element
     <>
       <Flex align="center" style={{ width: "100%" }} justify="space-between">
         <Text>Color Blend</Text>
-        <Select clearable={false} data={Object.values(ColorBlend)} value={colorBlend} onChange={(val) => val && setColorBlend(val as ColorBlend)} />
+        <Select clearable={false} data={Object.values(types.ColorBlend)} value={colorBlend} onChange={(val) => val && setColorBlend(val as types.ColorBlend)} />
       </Flex>
       <Divider my="sm" />
       <Flex align="center" style={{ width: "100%" }} justify="space-between">

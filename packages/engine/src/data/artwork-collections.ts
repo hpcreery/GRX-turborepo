@@ -117,12 +117,12 @@ class PrimitiveBufferCollection<T extends Shapes.Primitive | Shapes.DatumArc | S
    */
   public buffer: ArrayBuffer = new ArrayBuffer(STARTING_BUFFER_BYTE_LENGTH)
   public view: Float32Array = new Float32Array(this.buffer)
-  public readonly properties: string[]
+  public readonly properties: (keyof T)[]
   public readonly typeIdentifier: FeatureTypeIdentifiers
   public macros: (T | undefined)[] = []
   public length = 0
 
-  constructor(properties: string[], typeIdentifier: FeatureTypeIdentifiers) {
+  constructor(properties: (keyof T)[], typeIdentifier: FeatureTypeIdentifiers) {
     super()
     this.properties = properties
     this.typeIdentifier = typeIdentifier
@@ -146,7 +146,7 @@ class PrimitiveBufferCollection<T extends Shapes.Primitive | Shapes.DatumArc | S
       MacroArtworkCollection.create(shape.symbol)
       this.macros[index] = shape
     }
-    const shapeData = this.properties.map((key) => shape[key])
+    const shapeData = this.properties.map((key) => shape[key] as number)
     this.view.set(shapeData, index * this.properties.length)
     this.length += 1
     this.dispatchTypedEvent("update", new Event("update"))
@@ -187,7 +187,7 @@ class PrimitiveBufferCollection<T extends Shapes.Primitive | Shapes.DatumArc | S
         sym_num = this.view[index * this.properties.length + i]
         continue // Skip sym_num shape assignment as it is handled separately
       }
-      shape[this.properties[i]] = this.view[index * this.properties.length + i]
+      shape[this.properties[i]] = this.view[index * this.properties.length + i] as T[keyof T]
     }
     // Add symbol if it exists
     shape.symbol = SymbolBufferCollection.read(sym_num)
@@ -211,7 +211,7 @@ class PrimitiveBufferCollection<T extends Shapes.Primitive | Shapes.DatumArc | S
       MacroArtworkCollection.create(shape.symbol)
       this.macros[index] = shape
     }
-    const shapeData = this.properties.map((key) => shape[key])
+    const shapeData = this.properties.map((key) => shape[key] as unknown as number)
     for (let i = 0; i < this.properties.length; i++) {
       this.view[index * this.properties.length + i] = shapeData[i]
     }

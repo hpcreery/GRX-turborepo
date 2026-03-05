@@ -27,6 +27,6 @@ export const importFormats = {
 
 export type importFormatName = keyof typeof importFormats
 export const importFormatList = Object.keys(importFormats) as importFormatName[]
-export const defaultImportFormat = importFormatList["RS-274X"]
+export const defaultImportFormat: importFormatName = "RS-274X"
 
 export default importFormats

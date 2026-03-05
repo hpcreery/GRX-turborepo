@@ -1,11 +1,6 @@
-import type { Contour } from "@grx/engine/data/shape/shape.d"
-import { STANDARD_SYMBOLS, type StandardSymbol } from "@grx/engine/data/shape/symbol/symbol"
-import type { QuerySelection } from "@grx/engine/engine"
-import type { Renderer } from "@grx/engine/index"
-import { PointerEvents } from "@grx/engine/index"
-import { type AttributesType, FeatureTypeIdentifier, SymbolTypeIdentifier } from "@grx/engine/types"
-import { baseUnitsConversionFactor } from "@grx/engine/utils"
-import type { ShapeDistance } from "@grx/engine/view/shape-renderer"
+import { data, type engine, type Renderer, PointerEvents, utils, types } from "@grx/engine"
+const {FeatureTypeIdentifier, SymbolTypeIdentifier} = types
+
 import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
 import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
 import {
@@ -50,7 +45,7 @@ function CornerIcon({ children }: { children: JSX.Element }): JSX.Element {
 }
 
 export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
-  const [features, setFeatures] = useState<QuerySelection[]>([])
+  const [features, setFeatures] = useState<engine.QuerySelection[]>([])
   const [mounted, setMounted] = useState<boolean>(false)
   const { renderer } = useContext(EditorConfigProvider)
   const theme = useMantineTheme()
@@ -70,10 +65,10 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
 
   useEffect(() => {
     const handler = (e: Event): void => {
-      const featuresTemp = (e as CustomEvent<QuerySelection[]>).detail
+      const featuresTemp = (e as CustomEvent<engine.QuerySelection[]>).detail
       if (featuresTemp.length > 0) {
         setMounted(true)
-        setFeatures((e as CustomEvent<QuerySelection[]>).detail)
+        setFeatures((e as CustomEvent<engine.QuerySelection[]>).detail)
       } else {
         setMounted(false)
       }
@@ -141,7 +136,7 @@ export function FeatureSidebar(_props: ToolbarProps): JSX.Element {
 
 interface FeatureInfoProps {
   layer: string
-  selection: ShapeDistance
+  selection: types.ShapeDistance
   renderer: Renderer
 }
 
@@ -158,7 +153,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
 
   const layerColor = chroma.gl(color[0], color[1], color[2]).hex()
 
-  function getSymbolInfo(symbol: StandardSymbol): (JSX.Element | null)[] {
+  function getSymbolInfo(symbol: data.shape.symbol.StandardSymbol): (JSX.Element | null)[] {
     return Object.entries(symbol).map(([key, value], index) => {
       let representedValue = value
       if (key === "sym_num" || key === "symbol" || key === "type") return null
@@ -178,7 +173,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
           "ring_gap",
         ].includes(key)
       ) {
-        representedValue = `${(value / baseUnitsConversionFactor(units)).toFixed(3)}${units}`
+        representedValue = `${(value / utils.baseUnitsConversionFactor(units)).toFixed(3)}${units}`
       }
       if (key === "attributes") {
         return (
@@ -186,7 +181,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
             <Text key={index}>
               - {key}: <Code>{Object.keys(value).length}</Code>
             </Text>
-            {Object.entries(value as AttributesType).map(([key, value]) => (
+            {Object.entries(value as types.AttributesType).map(([key, value]) => (
               <>
                 <Text key={`${key}`} style={{ whiteSpace: "preserve" }}>
                   {" "}
@@ -204,7 +199,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
       )
     })
   }
-  const getAttributes = (attributes: AttributesType): JSX.Element => {
+  const getAttributes = (attributes: types.AttributesType): JSX.Element => {
     return (
       <>
         {Object.entries(attributes).map(([key, value]) => (
@@ -239,21 +234,21 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
             <Text>
               Start:{" "}
               <Code>
-                X:{(selection.shape.xs / baseUnitsConversionFactor(units)).toFixed(3)}
-                {units} Y:{(selection.shape.ys / baseUnitsConversionFactor(units)).toFixed(3)}
+                X:{(selection.shape.xs / utils.baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ys / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>
             <Text>
               End:{" "}
               <Code>
-                X:{(selection.shape.xe / baseUnitsConversionFactor(units)).toFixed(3)}
-                {units} Y:{(selection.shape.ye / baseUnitsConversionFactor(units)).toFixed(3)}
+                X:{(selection.shape.xe / utils.baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ye / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>
             <Text>
-              Symbol: <Code>{STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
+              Symbol: <Code>{data.shape.symbol.STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
             </Text>
             <Text>{getSymbolInfo(selection.shape.symbol)}</Text>
             <Text>
@@ -308,8 +303,8 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
             <Text>
               Center:{" "}
               <Code>
-                X:{(selection.shape.x / baseUnitsConversionFactor(units)).toFixed(3)}
-                {units} Y:{(selection.shape.y / baseUnitsConversionFactor(units)).toFixed(3)}
+                X:{(selection.shape.x / utils.baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.y / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>
@@ -329,7 +324,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
               Symbol:{" "}
               <Code>
                 {selection.shape.symbol.type == SymbolTypeIdentifier.SYMBOL_DEFINITION
-                  ? STANDARD_SYMBOLS[selection.shape.symbol.symbol]
+                  ? data.shape.symbol.STANDARD_SYMBOLS[selection.shape.symbol.symbol]
                   : selection.shape.symbol.id}
               </Code>
             </Text>
@@ -360,24 +355,24 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
             <Text>
               Start:{" "}
               <Code>
-                X:{(selection.shape.xs / baseUnitsConversionFactor(units)).toFixed(3)}
-                {units} Y:{(selection.shape.ys / baseUnitsConversionFactor(units)).toFixed(3)}
+                X:{(selection.shape.xs / utils.baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ys / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>
             <Text>
               End:{" "}
               <Code>
-                X:{(selection.shape.xe / baseUnitsConversionFactor(units)).toFixed(3)}
-                {units} Y:{(selection.shape.ye / baseUnitsConversionFactor(units)).toFixed(3)}
+                X:{(selection.shape.xe / utils.baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.ye / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>
             <Text>
               Center:{" "}
               <Code>
-                X:{(selection.shape.xc / baseUnitsConversionFactor(units)).toFixed(3)}
-                {units} Y:{(selection.shape.yc / baseUnitsConversionFactor(units)).toFixed(3)}
+                X:{(selection.shape.xc / utils.baseUnitsConversionFactor(units)).toFixed(3)}
+                {units} Y:{(selection.shape.yc / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>
@@ -385,7 +380,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
               Rotation: <Code>{selection.shape.clockwise === 1 ? "clockwise" : "counter clockwise"}</Code>
             </Text>
             <Text>
-              Symbol: <Code>{STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
+              Symbol: <Code>{data.shape.symbol.STANDARD_SYMBOLS[selection.shape.symbol.symbol]}</Code>
             </Text>
             <Text>{getSymbolInfo(selection.shape.symbol)}</Text>
             <Text>
@@ -413,13 +408,13 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
               Polarity: <Code>{selection.shape.polarity === 1 ? "+" : "-"}</Code>
             </Text>
             <Text>
-              Islands: <Code>{selection.shape.contours.filter((x: Contour) => x.poly_type == 1).length}</Code>
+              Islands: <Code>{selection.shape.contours.filter((x: data.shape.Contour) => x.poly_type == 1).length}</Code>
             </Text>
             <Text>
-              Holes: <Code>{selection.shape.contours.filter((x: Contour) => x.poly_type == 0).length}</Code>
+              Holes: <Code>{selection.shape.contours.filter((x: data.shape.Contour) => x.poly_type == 0).length}</Code>
             </Text>
             <Text>
-              Edges: <Code>{selection.shape.contours.map((ctr: Contour) => ctr.segments.length).reduce((p: number, c: number) => p + c, 0)}</Code>
+              Edges: <Code>{selection.shape.contours.map((ctr: data.shape.Contour) => ctr.segments.length).reduce((p: number, c: number) => p + c, 0)}</Code>
             </Text>
             <Text>
               Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>
@@ -448,7 +443,7 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
             <Text>
               Width:{" "}
               <Code>
-                {(selection.shape.width / baseUnitsConversionFactor(units)).toFixed(3)}
+                {(selection.shape.width / utils.baseUnitsConversionFactor(units)).toFixed(3)}
                 {units}
               </Code>
             </Text>

@@ -1,29 +1,23 @@
 import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
-import { importFormatList, importFormats } from "@grx/engine/data/import-plugins"
 import { Button, Card, Divider, FileButton, Group, Input, Modal, ScrollArea, Select, Stack, Text, useMantineTheme } from "@mantine/core"
 import { Dropzone, type FileWithPath } from "@mantine/dropzone"
 import { useLocalStorage } from "@mantine/hooks"
 import { notifications } from "@mantine/notifications"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { IconClearAll, IconContrast, IconContrastOff, IconFileVector, IconFileX } from "@tabler/icons-react"
-// import type { LayerInfo } from "@grx/engine/engine"
 import * as Comlink from "comlink"
-// import { EngineEvents } from "@grx/engine/engine"
 import { useContextMenu } from "mantine-contextmenu"
 import { Resizable } from "re-resizable"
 import { type JSX, useContext, useEffect, useState } from "react"
 import LayerListItem from "./LayerListItem"
-
-// import { DataInterface } from "@src/renderer"
-
-import type { importFormatName } from "@grx/engine/data/import-plugins"
+import { data } from "@grx/engine"
 
 type SidebarProps = {}
 
 export interface UploadFile extends FileWithPath {
-  format: importFormatName
+  format: data.importPlugins.importFormatName
   id: string
 }
 
@@ -41,12 +35,12 @@ export default function LayerSidebar(_props: SidebarProps): JSX.Element | null {
   })
 
   function identifyFileType(file: FileWithPath): string {
-    const defaultFormat = importFormatList[0]
+    const defaultFormat = data.importPlugins.importFormatList[0]
 
     const extension = file.name.split(".").pop()?.toLowerCase()
     if (!extension) return defaultFormat
-    for (const plugin in importFormats) {
-      if (importFormats[plugin].matchFile(extension)) return plugin
+    for (const plugin in data.importPlugins.importFormats) {
+      if (data.importPlugins.importFormats[plugin].matchFile(extension)) return plugin
     }
     return defaultFormat
   }
@@ -277,12 +271,12 @@ export default function LayerSidebar(_props: SidebarProps): JSX.Element | null {
                   <Select
                     w="100%"
                     placeholder="Select format"
-                    data={importFormatList}
+                    data={data.importPlugins.importFormatList}
                     defaultValue={file.format}
                     comboboxProps={{ shadow: "md" }}
                     onChange={(value): void => {
                       if (!value) return
-                      files.find((f) => f.id === file.id)!.format = value as importFormatName
+                      files.find((f) => f.id === file.id)!.format = value as data.importPlugins.importFormatName
                     }}
                   />
                 </Input.Wrapper>

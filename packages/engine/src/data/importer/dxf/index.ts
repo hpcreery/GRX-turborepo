@@ -26,6 +26,9 @@ export async function plugin(buffer: ArrayBuffer, parameters: object, api: typeo
   }
 
   // console.log("dxf", JSON.stringify(dxf))
+  if (!dxf) {
+    return console.error("Failed to parse DXF file")
+  }
 
   const layerHierarchy = converter.convert(dxf)
 

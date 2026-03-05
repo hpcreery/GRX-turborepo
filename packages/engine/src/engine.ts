@@ -8,7 +8,7 @@ import type { Transform } from "./transform"
 import type { ViewBox } from "./types"
 import { initStaticShaderCollections } from "./view/buffer-collections"
 import { initializeFontRenderer, initializeRenderers } from "./view/gl-commands"
-import type { ShapeDistance } from "./view/shape-renderer"
+import type { ShapeDistance } from "./types"
 import { ViewRenderer } from "./view/view"
 
 export interface RenderTransform {
@@ -157,7 +157,8 @@ export abstract class EngineInterface extends DataInterface {
     //   boxChanged = true
     // }
 
-    for (const key in Engine.boundingBox) {
+    const keys: (keyof DOMRect)[] = ["x", "y", "width", "height", "top", "left", "right", "bottom"]
+    for (const key of keys) {
       if (box[key] !== Engine.boundingBox[key]) {
         boxChanged = true
         break

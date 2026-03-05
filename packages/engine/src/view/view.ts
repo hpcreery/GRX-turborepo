@@ -13,7 +13,7 @@ import { UID, UpdateEventTarget } from "../utils"
 import { ReglRenderers, type TLoadedReglRenderers } from "./gl-commands"
 import LayerRenderer, { SelectionRenderer } from "./layer"
 import { SimpleMeasurement } from "./measurements"
-import type { ShapeDistance } from "./shape-renderer"
+import type { ShapeDistance } from "../types"
 // import { Engine } from '../engine'
 
 export type WorldProps = {}
@@ -277,7 +277,7 @@ export class ViewRenderer extends UpdateEventTarget {
 
   public updateViewBox(newViewBox: ViewBox): void {
     let viewBoxChanged = false
-    for (const key in this.viewBox) {
+    for (const key of Object.keys(this.viewBox) as Array<keyof ViewBox>) {
       if (newViewBox[key] !== this.viewBox[key]) {
         viewBoxChanged = true
         break

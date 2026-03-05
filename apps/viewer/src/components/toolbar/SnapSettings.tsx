@@ -1,4 +1,4 @@
-import { SNAP_MODES, SnapMode } from "@grx/engine/types"
+import { types } from "@grx/engine"
 import { Kbd, SegmentedControl } from "@mantine/core"
 import { useHotkeys, useLocalStorage } from "@mantine/hooks"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
@@ -6,11 +6,13 @@ import { actions } from "@src/contexts/Spotlight"
 import { IconPointerPin } from "@tabler/icons-react"
 import { type JSX, useContext, useEffect } from "react"
 
+const { SNAP_MODES, SnapMode } = types
+
 type SnapSettingsProps = {}
 
 export default function SnapSettings(_props: SnapSettingsProps): JSX.Element | null {
   const { renderer } = useContext(EditorConfigProvider)
-  const [snapMode, setSnapMode] = useLocalStorage<SnapMode>({
+  const [snapMode, setSnapMode] = useLocalStorage<types.SnapMode>({
     key: "engine:SNAP_MODE",
     // defaultValue: renderer.settings.SNAP_MODE,
     defaultValue: SnapMode.OFF,
@@ -90,5 +92,5 @@ export default function SnapSettings(_props: SnapSettingsProps): JSX.Element | n
     ],
   ])
 
-  return <SegmentedControl radius="sm" value={snapMode} data={SNAP_MODES} onChange={(val) => val && setSnapMode(val as SnapMode)} />
+  return <SegmentedControl radius="sm" value={snapMode} data={SNAP_MODES} onChange={(val) => val && setSnapMode(val as types.SnapMode)} />
 }

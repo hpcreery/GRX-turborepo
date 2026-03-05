@@ -6,7 +6,7 @@ import { mat3, vec2, type vec3 } from "gl-matrix"
 import type REGL from "regl"
 import { settings } from "../settings"
 import ShapeTransform, { type Transform } from "../transform"
-import { type BoundingBox, FeatureTypeIdentifier, SNAP_MODES_MAP } from "../types"
+import { type BoundingBox, FeatureTypeIdentifier, SNAP_MODES_MAP, type ShapeDistance } from "../types"
 import { UpdateEventTarget } from "../utils"
 import { MacroShaderCollection, ShapesShaderCollection, SymbolShaderCollection } from "./buffer-collections"
 import { ReglRenderers, type TLoadedReglRenderers } from "./gl-commands"
@@ -60,14 +60,6 @@ interface ShapeRendererCommonContext {
   qtyFeaturesRef: number
   prevQtyFeaturesRef: number
   transformMatrix: mat3
-}
-
-export type ShapeDistance = {
-  // snapPoint?: vec2
-  direction?: vec2
-  distance?: number
-  shape: Shapes.Shape
-  children: ShapeDistance[]
 }
 
 export interface ShapeRendererEvents {

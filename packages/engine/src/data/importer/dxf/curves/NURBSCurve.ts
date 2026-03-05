@@ -7,7 +7,9 @@ import {
   // Curve,
   Vector3,
   Vector4,
+  // @ts-expect-error no types available for dxf-parser --- IGNORE ---
 } from "../vec"
+// @ts-expect-error no types available for dxf-parser --- IGNORE ---
 import * as NURBSUtils from "./NURBSUtils.js"
 
 /**
@@ -27,10 +29,15 @@ export class NURBSCurve {
   public endKnot: number
 
   constructor(
+    // @ts-expect-error unknown type for
     degree,
+    // @ts-expect-error unknown type for
     knots /* array of reals */,
+    // @ts-expect-error unknown type for
     controlPoints /* array of Vector(2|3|4) */,
+    // @ts-expect-error unknown type for
     startKnot? /* index in knots */,
+    // @ts-expect-error unknown type for
     endKnot? /* index in knots */,
   ) {
     // super();

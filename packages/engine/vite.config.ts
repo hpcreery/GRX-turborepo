@@ -1,29 +1,26 @@
-import path, { resolve } from "node:path"
-import { glob } from "glob"
+import { resolve } from "node:path"
 import glslify from "rollup-plugin-glslify"
-import dts from "unplugin-dts/vite"
 import { defineConfig, type PluginOption } from "vite"
 import arraybuffer from "vite-plugin-arraybuffer"
-import { comlink } from "vite-plugin-comlink"
+// import { comlink } from "vite-plugin-comlink"
 import pkg from "./package.json"
-
-const inputFiles = glob.sync(path.resolve(__dirname, "src/**/*.ts").replace(/\\/g, "/"))
-
-console.log("inputFiles:", inputFiles)
+import typescript from '@rollup/plugin-typescript';
 
 export default defineConfig({
   base: "./",
+  cacheDir: '.vite',
   build: {
+    target: "esnext",
     emptyOutDir: true,
     minify: false,
-    sourcemap: true,
+    sourcemap: false,
     lib: {
       entry: "./src/index.ts",
       name: pkg.name,
       formats: ["es"],
     },
     rollupOptions: {
-      input: inputFiles,
+      input: "./src/index.ts",
       // Make sure to externalize deps that shouldn't be bundled
       external: [...Object.keys(pkg.dependencies || {}), ...Object.keys(pkg.peerDependencies || {})],
       output: {
@@ -41,8 +38,8 @@ export default defineConfig({
     },
   },
   plugins: [
-    dts(),
-    comlink(),
+    // comlink(),
+    typescript(),
     arraybuffer(),
     glslify({
       compress: false,
@@ -53,8 +50,8 @@ export default defineConfig({
   worker: {
     format: "es",
     plugins: () => [
-      dts(),
-      comlink(),
+      // comlink(),
+      // typescript(),
       arraybuffer(),
       glslify({
         compress: false,

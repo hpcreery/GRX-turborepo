@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "prepare": "husky",
-    "dev": "turbo run dev",
+    "dev": "turbo watch dev",
     "dev:desktop": "turbo run dev:desktop",
     "build": "turbo run build",
     "build:desktop": "turbo run build:desktop",
@@ -21,7 +21,7 @@
     "commitlint": "^20.4.2",
     "git-cliff": "^2.12.0",
     "husky": "^9.1.7",
-    "turbo": "^2.8.3",
+    "turbo": "2.8.14-canary.6",
     "typescript": "5.9.3"
   },
   "engines": {

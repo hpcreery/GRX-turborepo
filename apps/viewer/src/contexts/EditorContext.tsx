@@ -1,5 +1,4 @@
-import { Renderer } from "@grx/engine/index"
-import type { Units } from "@grx/engine/types"
+import { Renderer, type types } from "@grx/engine"
 import type { ContextMenuItemOptions } from "mantine-contextmenu"
 import React from "react"
 
@@ -9,8 +8,8 @@ export interface EditorContext {
     name: string
     stepName: string
   }
-  units: Units
-  setUnits: React.Dispatch<React.SetStateAction<Units>>
+  units: types.Units
+  setUnits: React.Dispatch<React.SetStateAction<types.Units>>
 }
 
 export const EditorConfigProvider = React.createContext<EditorContext>({

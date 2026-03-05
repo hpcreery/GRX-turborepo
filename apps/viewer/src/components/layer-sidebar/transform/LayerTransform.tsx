@@ -2,13 +2,10 @@ import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSe
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import type { TransformOrder } from "@grx/engine/transform"
-import type { Binary } from "@grx/engine/types"
-import { baseUnitsConversionFactor } from "@grx/engine/utils"
+import { utils, type types, type transform } from "@grx/engine"
 import { Button, Group, Input, Modal, NumberInput, Paper, Space, Stack, Switch } from "@mantine/core"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { IconGripHorizontal } from "@tabler/icons-react"
-// import type { LayerInfo } from "@grx/engine/engine"
 import { vec2 } from "gl-matrix"
 import { type JSX, useContext, useEffect, useState } from "react"
 
@@ -35,13 +32,13 @@ export default function LayerTransform(props: LayerTransformProps): JSX.Element 
   /**
    * Mirror x cooriinate values => x = -x
    */
-  const [mirror_x, setMirrorX] = useState<Binary>(0)
+  const [mirror_x, setMirrorX] = useState<types.Binary>(0)
   /**
    * Mirror y cooriinate values => y = -y
    */
-  const [mirror_y, setMirrorY] = useState<Binary>(0)
+  const [mirror_y, setMirrorY] = useState<types.Binary>(0)
 
-  const [transformOrder, setTransformOrder] = useState<TransformOrder>(["translate", "rotate", "mirror", "scale"])
+  const [transformOrder, setTransformOrder] = useState<transform.TransformOrder>(["translate", "rotate", "mirror", "scale"])
 
   const { units, renderer } = useContext(EditorConfigProvider)
   const [layerName, setLayerName] = useState<string>("")
@@ -115,17 +112,17 @@ export default function LayerTransform(props: LayerTransformProps): JSX.Element 
           label={`Datum X (${units})`}
           description="Layer X translation"
           placeholder="Input number"
-          value={roundToThree(datumX * baseUnitsConversionFactor(units))}
+          value={roundToThree(datumX * utils.baseUnitsConversionFactor(units))}
           step={1}
-          onChange={(x) => setDatumX(roundToThree(Number(x) / baseUnitsConversionFactor(units)))}
+          onChange={(x) => setDatumX(roundToThree(Number(x) / utils.baseUnitsConversionFactor(units)))}
         />
         <NumberInput
           label={`Datum Y (${units})`}
           description="Layer Y translation"
           placeholder="Input number"
-          value={roundToThree(datumY * baseUnitsConversionFactor(units))}
+          value={roundToThree(datumY * utils.baseUnitsConversionFactor(units))}
           step={1}
-          onChange={(y) => setDatumY(roundToThree(Number(y) / baseUnitsConversionFactor(units)))}
+          onChange={(y) => setDatumY(roundToThree(Number(y) / utils.baseUnitsConversionFactor(units)))}
         />
       </Group>
       <Space h="md" />

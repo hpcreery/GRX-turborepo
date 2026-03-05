@@ -5,7 +5,6 @@
     "rootDir": "src",
     "target": "ESNext",
     "allowJs": true,
-    "strict": false,
   },
   "include": ["./src"],
   "exclude": ["node_modules", "dist"]

@@ -1,7 +1,7 @@
 // import chroma from 'chroma-js'
 
-import type { PointerSettings } from "@grx/engine/index"
-import { PointerMode } from "@grx/engine/types"
+import type { PointerSettings } from "@grx/engine"
+import { types } from "@grx/engine"
 import { ActionIcon, Card, Group, Kbd, Modal, Popover, Tooltip, useMantineTheme } from "@mantine/core"
 import { useDisclosure, useHotkeys } from "@mantine/hooks"
 import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
@@ -34,6 +34,8 @@ import EngineSettings from "./EngineSettings"
 import GeneralSettings from "./GeneralSettings"
 import GridSettings from "./GridSettings"
 import SnapSettings from "./SnapSettings"
+
+const { PointerMode } = types
 
 type ToolbarProps = {}
 

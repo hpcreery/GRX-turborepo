@@ -1,6 +1,6 @@
 import "./App.css"
-import { Renderer } from "@grx/engine/index"
-import type { Units } from "@grx/engine/types"
+import { Renderer } from "@grx/engine"
+import type { types } from "@grx/engine"
 import { Box, Center, Loader, Skeleton, useMantineColorScheme, useMantineTheme } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import { IconPhotoDown } from "@tabler/icons-react"
@@ -70,7 +70,7 @@ export default function App(): JSX.Element | null {
     // removed this use effect deps to ensure background color was set in setup
   })
 
-  const [units, setUnits] = useLocalStorage<Units>({
+  const [units, setUnits] = useLocalStorage<types.Units>({
     key: "units",
     defaultValue: "mm",
   })

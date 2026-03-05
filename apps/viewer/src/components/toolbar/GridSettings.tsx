@@ -1,5 +1,4 @@
-import { gridSettings } from "@grx/engine/settings"
-import { baseUnitsConversionFactor } from "@grx/engine/utils"
+import { utils, settings } from "@grx/engine"
 import { Button, ColorPicker, Divider, Flex, Group, NumberInput, SegmentedControl, Space, Switch, Text } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import chroma from "chroma-js"
@@ -8,7 +7,7 @@ import React, { type JSX, useEffect } from "react"
 import { EditorConfigProvider } from "../../contexts/EditorContext"
 
 type GridSettingsProps = {}
-const defaultGridSettings = JSON.parse(JSON.stringify(gridSettings))
+const defaultGridSettings = JSON.parse(JSON.stringify(settings.gridSettings))
 
 export default function GridSettings(_props: GridSettingsProps): JSX.Element | null {
   const { units, renderer } = React.useContext(EditorConfigProvider)
@@ -118,15 +117,15 @@ export default function GridSettings(_props: GridSettingsProps): JSX.Element | n
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((spacingX * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setSpacingX(Number(value) / baseUnitsConversionFactor(units))}
+            value={Math.round((spacingX * utils.baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setSpacingX(Number(value) / utils.baseUnitsConversionFactor(units))}
           />
           Y:
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((spacingY * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setSpacingY(Number(value) / baseUnitsConversionFactor(units))}
+            value={Math.round((spacingY * utils.baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setSpacingY(Number(value) / utils.baseUnitsConversionFactor(units))}
           />
         </Group>
       </Flex>
@@ -143,15 +142,15 @@ export default function GridSettings(_props: GridSettingsProps): JSX.Element | n
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((offsetX * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setOffsetX(Number(value) / baseUnitsConversionFactor(units))}
+            value={Math.round((offsetX * utils.baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setOffsetX(Number(value) / utils.baseUnitsConversionFactor(units))}
           />
           Y:
           <NumberInput
             allowNegative={false}
             suffix={` ${units}`}
-            value={Math.round((offsetY * baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
-            onChange={(value): void => setOffsetY(Number(value) / baseUnitsConversionFactor(units))}
+            value={Math.round((offsetY * utils.baseUnitsConversionFactor(units) + Number.EPSILON) * 1000) / 1000}
+            onChange={(value): void => setOffsetY(Number(value) / utils.baseUnitsConversionFactor(units))}
           />
         </Group>
       </Flex>

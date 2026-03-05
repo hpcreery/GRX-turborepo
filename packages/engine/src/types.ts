@@ -1,4 +1,5 @@
 import type { vec2 } from "gl-matrix"
+import type * as Shapes from "@src/data/shape/shape"
 
 export const FeatureTypeIdentifier = {
   PAD: "pad",
@@ -103,4 +104,12 @@ export interface ViewBox {
   height: number
   x: number
   y: number
+}
+
+export type ShapeDistance = {
+  // snapPoint?: vec2
+  direction?: vec2
+  distance?: number
+  shape: Shapes.Shape
+  children: ShapeDistance[]
 }
