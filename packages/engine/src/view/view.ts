@@ -181,7 +181,12 @@ export class ViewRenderer extends UpdateEventTarget {
     this.id = id || UID()
     this.dataStep = dataStep
 
-    this.viewBox = viewBox
+    this.viewBox = {
+      x: viewBox.x,
+      y: viewBox.y,
+      width: viewBox.width,
+      height: viewBox.height,
+    }
     this.transform.position = [this.viewBox.width / 2, this.viewBox.height / 2]
 
     this.regl = regl
@@ -277,13 +282,19 @@ export class ViewRenderer extends UpdateEventTarget {
 
   public updateViewBox(newViewBox: ViewBox): void {
     let viewBoxChanged = false
-    for (const key of Object.keys(this.viewBox) as Array<keyof ViewBox>) {
+    const a = Object.keys(this.viewBox) as (keyof ViewBox)[]
+    a.forEach((key) => {
       if (newViewBox[key] !== this.viewBox[key]) {
         viewBoxChanged = true
-        break
+        return
       }
+    })
+    this.viewBox = {
+      x: newViewBox.x,
+      y: newViewBox.y,
+      width: newViewBox.width,
+      height: newViewBox.height,
     }
-    this.viewBox = newViewBox
     if (viewBoxChanged) {
       this.announceUpdate()
     }

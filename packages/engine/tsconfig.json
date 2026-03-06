@@ -16,6 +16,6 @@
       ],
     },
   },
-  "include": ["src"],
+  "include": ["src", "demo/DEMO.tsx"],
   "exclude": ["**/node_modules/**/*", "dist"],
 }

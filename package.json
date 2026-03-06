@@ -5,7 +5,7 @@
   "scripts": {
     "prepare": "husky",
     "dev": "turbo watch dev",
-    "dev:desktop": "turbo run dev:desktop",
+    "dev:desktop": "turbo watch dev:desktop",
     "build": "turbo run build",
     "build:desktop": "turbo run build:desktop",
     "lint": "biome lint --write",

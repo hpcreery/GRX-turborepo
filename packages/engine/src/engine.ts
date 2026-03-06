@@ -153,10 +153,6 @@ export abstract class EngineInterface extends DataInterface {
     Engine.dpr = dpr
 
     let boxChanged = false
-    // if (Engine.boundingBox.width !== width || Engine.boundingBox.height !== height) {
-    //   boxChanged = true
-    // }
-
     const keys: (keyof DOMRect)[] = ["x", "y", "width", "height", "top", "left", "right", "bottom"]
     for (const key of keys) {
       if (box[key] !== Engine.boundingBox[key]) {

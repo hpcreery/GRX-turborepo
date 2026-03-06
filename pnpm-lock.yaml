@@ -229,6 +229,12 @@ importers:
       '@hpcreery/tracespace-renderer':
         specifier: ^5.0.3
         version: 5.0.3
+      '@mantine/core':
+        specifier: ^7.17.8
+        version: 7.17.8(@mantine/hooks@7.17.8(react@19.2.4))(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react@19.2.4)
+      '@mantine/hooks':
+        specifier: ^7.17.8
+        version: 7.17.8(react@19.2.4)
       '@tracespace/parser':
         specifier: ^5.0.0-next.0
         version: 5.0.0-next.0
@@ -259,6 +265,12 @@ importers:
       ndarray:
         specifier: ^1.0.19
         version: 1.0.19
+      react:
+        specifier: ^19.2.4
+        version: 19.2.4
+      react-dom:
+        specifier: ^19.2.4
+        version: 19.2.4(react@19.2.4)
       regl:
         specifier: ^2.1.1
         version: 2.1.1
@@ -287,6 +299,15 @@ importers:
       '@types/earcut':
         specifier: ^3.0.0
         version: 3.0.0
+      '@types/react':
+        specifier: ^19.2.14
+        version: 19.2.14
+      '@types/react-dom':
+        specifier: 19.2.2
+        version: 19.2.2(@types/react@19.2.14)
+      '@vitejs/plugin-react':
+        specifier: ^5.1.4
+        version: 5.1.4(vite@7.3.1(@types/node@25.3.3)(jiti@2.6.1)(tsx@4.21.0))
       glob:
         specifier: ^11.0.3
         version: 11.1.0
