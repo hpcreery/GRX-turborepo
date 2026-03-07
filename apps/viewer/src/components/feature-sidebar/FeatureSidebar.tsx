@@ -1,5 +1,6 @@
-import { data, type engine, type Renderer, PointerEvents, utils, types } from "@grx/engine"
-const {FeatureTypeIdentifier, SymbolTypeIdentifier} = types
+import { data, type engine, PointerEvents, type Renderer, types, utils } from "@grx/engine"
+
+const { FeatureTypeIdentifier, SymbolTypeIdentifier } = types
 
 import { ActionIcon, Affix, Badge, Card, Code, Divider, ScrollArea, Text, ThemeIcon, Transition, useMantineTheme } from "@mantine/core"
 import { EditorConfigProvider, menuItems } from "@src/contexts/EditorContext"
@@ -414,7 +415,8 @@ function FeatureInfo(props: FeatureInfoProps): JSX.Element {
               Holes: <Code>{selection.shape.contours.filter((x: data.shape.Contour) => x.poly_type == 0).length}</Code>
             </Text>
             <Text>
-              Edges: <Code>{selection.shape.contours.map((ctr: data.shape.Contour) => ctr.segments.length).reduce((p: number, c: number) => p + c, 0)}</Code>
+              Edges:{" "}
+              <Code>{selection.shape.contours.map((ctr: data.shape.Contour) => ctr.segments.length).reduce((p: number, c: number) => p + c, 0)}</Code>
             </Text>
             <Text>
               Attributes: <Code>{Object.keys(selection.shape.attributes).length}</Code>

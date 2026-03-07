@@ -1,13 +1,12 @@
 import { createTheme, MantineProvider } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import { Notifications } from "@mantine/notifications"
+import { Spotlight } from "@mantine/spotlight"
 import { ContextMenuProvider } from "mantine-contextmenu"
 import ReactDOM from "react-dom/client"
 import App from "./App"
-import { ThemeConfigProvider } from "./contexts/ThemeContext"
-
-import { Spotlight } from "@mantine/spotlight"
 import { actions, spotlightStore } from "./contexts/Spotlight"
+import { ThemeConfigProvider } from "./contexts/ThemeContext"
 
 // STYLES
 import "@mantine/core/styles.css"

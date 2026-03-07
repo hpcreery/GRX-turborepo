@@ -5,6 +5,7 @@ import { type PointerEvent, PointerEvents, Renderer } from "../src"
 import * as Shapes from "../src/data/shape/shape"
 import * as Symbols from "../src/data/shape/symbol/symbol"
 import { POINTER_MODES, type POINTER_MODES_MAP, SNAP_MODES, type SNAP_MODES_MAP } from "../src/types"
+
 // import * as BufferCollection from './engine/buffer-collection'
 
 // import gdsiiFile from '@lib/gdsii/testdata/various.gds?arraybuffer'

@@ -90,7 +90,12 @@ export default function EngineSettings(_props: EngineSettingsProps): JSX.Element
     <>
       <Flex align="center" style={{ width: "100%" }} justify="space-between">
         <Text>Color Blend</Text>
-        <Select clearable={false} data={Object.values(types.ColorBlend)} value={colorBlend} onChange={(val) => val && setColorBlend(val as types.ColorBlend)} />
+        <Select
+          clearable={false}
+          data={Object.values(types.ColorBlend)}
+          value={colorBlend}
+          onChange={(val) => val && setColorBlend(val as types.ColorBlend)}
+        />
       </Flex>
       <Divider my="sm" />
       <Flex align="center" style={{ width: "100%" }} justify="space-between">

@@ -5,10 +5,9 @@ import { DataInterface } from "./data/interface"
 import type { GridSettings, MeasurementSettings, RenderSettings } from "./settings"
 import { gridSettings, measurementSettings, settings } from "./settings"
 import type { Transform } from "./transform"
-import type { ViewBox } from "./types"
+import type { ShapeDistance, ViewBox } from "./types"
 import { initStaticShaderCollections } from "./view/buffer-collections"
 import { initializeFontRenderer, initializeRenderers } from "./view/gl-commands"
-import type { ShapeDistance } from "./types"
 import { ViewRenderer } from "./view/view"
 
 export interface RenderTransform {

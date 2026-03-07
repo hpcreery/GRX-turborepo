@@ -1,14 +1,14 @@
 import { resolve } from "node:path"
+import typescript from "@rollup/plugin-typescript"
 import glslify from "rollup-plugin-glslify"
 import { defineConfig, type PluginOption } from "vite"
 import arraybuffer from "vite-plugin-arraybuffer"
 // import { comlink } from "vite-plugin-comlink"
 import pkg from "./package.json"
-import typescript from '@rollup/plugin-typescript';
 
 export default defineConfig({
   base: "./",
-  cacheDir: '.vite',
+  cacheDir: ".vite",
   build: {
     target: "esnext",
     emptyOutDir: true,

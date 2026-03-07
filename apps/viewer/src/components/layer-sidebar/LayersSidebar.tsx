@@ -1,6 +1,7 @@
 import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSensor, useSensor, useSensors } from "@dnd-kit/core"
 import { restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, verticalListSortingStrategy } from "@dnd-kit/sortable"
+import { data } from "@grx/engine"
 import { Button, Card, Divider, FileButton, Group, Input, Modal, ScrollArea, Select, Stack, Text, useMantineTheme } from "@mantine/core"
 import { Dropzone, type FileWithPath } from "@mantine/dropzone"
 import { useLocalStorage } from "@mantine/hooks"
@@ -12,7 +13,6 @@ import { useContextMenu } from "mantine-contextmenu"
 import { Resizable } from "re-resizable"
 import { type JSX, useContext, useEffect, useState } from "react"
 import LayerListItem from "./LayerListItem"
-import { data } from "@grx/engine"
 
 type SidebarProps = {}
 

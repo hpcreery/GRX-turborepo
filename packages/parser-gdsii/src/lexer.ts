@@ -1,6 +1,5 @@
 import * as GDSII from "./gdsii_records"
 import messages from "./messages"
-// @ts-ignore - no types available for struct
 import struct from "./struct"
 import type { RecordToken } from "./types"
 // LEXER

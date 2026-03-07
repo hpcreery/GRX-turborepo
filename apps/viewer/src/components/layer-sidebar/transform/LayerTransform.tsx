@@ -2,7 +2,7 @@ import { closestCenter, DndContext, type DragEndEvent, KeyboardSensor, PointerSe
 import { restrictToParentElement, restrictToVerticalAxis } from "@dnd-kit/modifiers"
 import { arrayMove, SortableContext, sortableKeyboardCoordinates, useSortable, verticalListSortingStrategy } from "@dnd-kit/sortable"
 import { CSS } from "@dnd-kit/utilities"
-import { utils, type types, type transform } from "@grx/engine"
+import { type transform, type types, utils } from "@grx/engine"
 import { Button, Group, Input, Modal, NumberInput, Paper, Space, Stack, Switch } from "@mantine/core"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import { IconGripHorizontal } from "@tabler/icons-react"

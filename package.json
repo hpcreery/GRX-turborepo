@@ -15,7 +15,7 @@
     "changelog": "git-cliff --config cliff.toml --latest"
   },
   "devDependencies": {
-    "@biomejs/biome": "^2.4.0",
+    "@biomejs/biome": "^2.4.5",
     "@commitlint/cli": "^20.4.2",
     "@commitlint/config-conventional": "^20.4.1",
     "commitlint": "^20.4.2",

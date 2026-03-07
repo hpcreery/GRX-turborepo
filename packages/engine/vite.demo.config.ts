@@ -1,16 +1,16 @@
 import { resolve } from "node:path"
+import typescript from "@rollup/plugin-typescript"
+import react from "@vitejs/plugin-react"
 import glslify from "rollup-plugin-glslify"
 import { defineConfig, type PluginOption } from "vite"
 import arraybuffer from "vite-plugin-arraybuffer"
 // import { comlink } from "vite-plugin-comlink"
-import pkg from "./package.json"
-import typescript from '@rollup/plugin-typescript';
-import react from "@vitejs/plugin-react"
+// import pkg from "./package.json"
 
 export default defineConfig({
   base: "./",
   root: resolve("demo/"),
-  cacheDir: '.vite',
+  cacheDir: ".vite",
   resolve: {
     alias: {
       "@src": resolve("src"),

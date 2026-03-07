@@ -1,5 +1,5 @@
 {
-  "$schema": "https://biomejs.dev/schemas/2.4.0/schema.json",
+  "$schema": "https://biomejs.dev/schemas/2.4.5/schema.json",
   "vcs": {
     "enabled": false,
     "clientKind": "git",
@@ -12,6 +12,8 @@
       "!!**/out",
       "!!**/dist",
       "!!**/dist-desktop",
+      "!!**/.vite",
+      "!!**/.turbo",
       "!!**/pnpm-lock.yaml",
       "!!**/LICENSE.md",
       "!!**/tsconfig.json",

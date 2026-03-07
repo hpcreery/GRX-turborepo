@@ -7,13 +7,13 @@ import EngineWorker from "./engine?worker"
 import { PointerMode } from "./types"
 import { UID } from "./utils"
 
-export * as data from "./data"
-export * as types from "./types"
-export * as settings from "./settings"
 export * as constants from "./constants"
-export * as utils from "./utils"
-export * as transform from "./transform"
+export * as data from "./data"
 export * as engine from "./engine"
+export * as settings from "./settings"
+export * as transform from "./transform"
+export * as types from "./types"
+export * as utils from "./utils"
 
 export interface RenderEngineFrontendConfig {
   container?: HTMLElement

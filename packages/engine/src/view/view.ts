@@ -8,12 +8,12 @@ import type { RenderSettings } from "../settings"
 import { gridSettings, origin, settings } from "../settings"
 import type Transform from "../transform"
 import ShapeTransform from "../transform"
+import type { ShapeDistance } from "../types"
 import { type BoundingBox, ColorBlend, SNAP_MODES_MAP, SnapMode, type Units, type ViewBox } from "../types"
 import { UID, UpdateEventTarget } from "../utils"
 import { ReglRenderers, type TLoadedReglRenderers } from "./gl-commands"
 import LayerRenderer, { SelectionRenderer } from "./layer"
 import { SimpleMeasurement } from "./measurements"
-import type { ShapeDistance } from "../types"
 // import { Engine } from '../engine'
 
 export type WorldProps = {}

@@ -1,6 +1,6 @@
 import "./App.css"
-import { Renderer } from "@grx/engine"
 import type { types } from "@grx/engine"
+import { Renderer } from "@grx/engine"
 import { Box, Center, Loader, Skeleton, useMantineColorScheme, useMantineTheme } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import { IconPhotoDown } from "@tabler/icons-react"

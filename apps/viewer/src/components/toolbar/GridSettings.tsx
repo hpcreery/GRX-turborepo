@@ -1,4 +1,4 @@
-import { utils, settings } from "@grx/engine"
+import { settings, utils } from "@grx/engine"
 import { Button, ColorPicker, Divider, Flex, Group, NumberInput, SegmentedControl, Space, Switch, Text } from "@mantine/core"
 import { useLocalStorage } from "@mantine/hooks"
 import chroma from "chroma-js"

@@ -1,5 +1,4 @@
-import { type PointerEvent, PointerEvents } from "@grx/engine"
-import { utils } from "@grx/engine"
+import { type PointerEvent, PointerEvents, utils } from "@grx/engine"
 import { Card, Group, Text, Tooltip } from "@mantine/core"
 import { EditorConfigProvider } from "@src/contexts/EditorContext"
 import React, { type JSX } from "react"

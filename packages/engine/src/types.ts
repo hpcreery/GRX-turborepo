@@ -1,5 +1,5 @@
-import type { vec2 } from "gl-matrix"
 import type * as Shapes from "@src/data/shape/shape"
+import type { vec2 } from "gl-matrix"
 
 export const FeatureTypeIdentifier = {
   PAD: "pad",
