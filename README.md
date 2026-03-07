@@ -54,20 +54,21 @@ GRX is designed to be an easy to use online manufacturing artwork data exchange 
 
 ### Tools
 
-- [Electron](https://electronjs.org/)
-- [React](https://reactjs.org/)
-- [regl](http://regl.party/)
-- [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
 - [WebGL](https://developer.mozilla.org/en-US/docs/Web/API/WebGL_API)
+- [Web Workers](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API)
+- [regl](http://regl.party/)
 - [Typescript](https://www.typescriptlang.org/)
-- [Tracespace (forked)](https://github.com/hpcreery/tracespace)
 - [Vite](https://vitejs.dev/)
+- [React](https://reactjs.org/)
+- [Electron](https://electronjs.org/)
+- [Tracespace (forked)](https://github.com/hpcreery/tracespace)
 - [Mantine](https://mantine.dev/)
+- [TurboRepo](https://turbo.build)
 
 ## GETTING STARTED
 
 Prerequisites:
-- [Node.js](https://nodejs.org/) (version 23 or higher)
+- [Node.js](https://nodejs.org/) (version 20 or higher)
 - [pnpm](https://pnpm.io/) (version 10 or higher)
 
 Setup the project:

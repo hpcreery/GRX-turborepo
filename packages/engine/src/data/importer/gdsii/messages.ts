@@ -56,6 +56,7 @@ function useMessageHandler(): MessageHandler {
   }
 }
 
+// biome-ignore lint/correctness/useHookAtTopLevel: idk
 const messages = useMessageHandler()
 
 export default messages

@@ -4,6 +4,7 @@
   "compilerOptions": {
     "lib": ["esnext", "dom", "dom.iterable"],
     "outDir": "./dist",
+    "rootDir": "./src",
     "declaration": true,
     "declarationMap": true,
     "types": [
@@ -16,6 +17,6 @@
       ],
     },
   },
-  "include": ["src", "demo/DEMO.tsx"],
+  "include": ["src"],
   "exclude": ["**/node_modules/**/*", "dist"],
 }
