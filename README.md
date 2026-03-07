@@ -141,9 +141,9 @@ Project Structure
 │   ├── engine         <-- (core rendering engine)
 │   │   ├── src
 │   │   └── package.json
-│   ├── parser-*       <-- (parser packages for different formats)
-│   │   ├── src
-│   │   └── package.json
+│   └── parser-*       <-- (parser packages for different formats)
+│       ├── src
+│       └── package.json
 ├── biome.json
 ├── pnpm-workspace.yaml
 ├── turbo.json
