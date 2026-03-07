@@ -15,7 +15,7 @@
   </div>
 </div>
 
-![preview](/resources/screenshot-v3.1-dark.png)
+![preview](/resources/screenshots/v4/screenshot-dark.png)
 
 MENU: **[ABOUT](#about)** | **[KEY FEATURES](#key-features)** | **[GETTING STARTED](#getting-started)** | **[CONTRIBUTE](#contribute)**
 
