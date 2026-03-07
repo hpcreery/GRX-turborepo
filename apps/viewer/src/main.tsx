@@ -5,8 +5,6 @@ import { ContextMenuProvider } from "mantine-contextmenu"
 import ReactDOM from "react-dom/client"
 import App from "./App"
 import { ThemeConfigProvider } from "./contexts/ThemeContext"
-// import DemoApp from "./renderer/DEMO"
-// import NCDemo from '@lib/nc/DEMO'
 
 import { Spotlight } from "@mantine/spotlight"
 import { actions, spotlightStore } from "./contexts/Spotlight"
@@ -36,7 +34,8 @@ function Main(): JSX.Element | null {
     primaryColor: primaryColor,
     defaultRadius: "md",
     colors: {
-      dark: ["#C2C2C2", "#A7A7A7", "#919191", "#5E5E5E", "#393939", "#2D2D2D", "#262626", "#1B1B1B", "#141414", "#101010"],
+      old: ["#C2C2C2", "#A7A7A7", "#919191", "#5E5E5E", "#393939", "#2D2D2D", "#262626", "#1B1B1B", "#141414", "#101010"],
+      dark: ["#C2C2C2", "#A7A7A7", "#919191", "#5E5E5E", "#393939", "#2D2D2D", "#101010", "#0f0f0f", "#090909", "#000000"],
     },
     other: {},
   })
